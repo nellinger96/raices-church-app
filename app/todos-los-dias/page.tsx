@@ -220,9 +220,36 @@ export default function TodosLosDiasPage() {
                     </div>
                   </div>
 
-                  <p className="pt-2 text-base font-bold leading-7 text-[#4B5563]">
-                    {todosLosDiasChurch.address}
-                  </p>
+                  <div className="pt-2">
+                    <a
+                      href={todosLosDiasChurch.googleMapsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block text-base font-black leading-7 text-[#111111] underline decoration-[#C99A2E] decoration-2 underline-offset-4 hover:text-[#E31B23]"
+                    >
+                      {todosLosDiasChurch.address}
+                    </a>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <a
+                        href={todosLosDiasChurch.googleMapsUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="bg-[#111111] px-4 py-2 text-sm font-black text-white hover:bg-[#E31B23]"
+                      >
+                        Google Maps
+                      </a>
+
+                      <a
+                        href={todosLosDiasChurch.appleMapsUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="bg-[#F8F1E3] px-4 py-2 text-sm font-black text-[#111111] hover:bg-[#C99A2E]"
+                      >
+                        Apple Maps
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
 

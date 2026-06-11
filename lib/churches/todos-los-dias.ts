@@ -16,6 +16,10 @@ export const todosLosDiasChurch = {
   zelleLabel: "Donaciones por Zelle",
   zelleInfo: "Próximamente: correo, teléfono o código QR de Zelle",
   address: "1310 E Lincoln Ave, Orange, CA 92865",
+  googleMapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=1310%20E%20Lincoln%20Ave%2C%20Orange%2C%20CA%2092865",
+  appleMapsUrl:
+    "https://maps.apple.com/?q=1310%20E%20Lincoln%20Ave%2C%20Orange%2C%20CA%2092865",
 };
 
 export const serviceTimes = [
