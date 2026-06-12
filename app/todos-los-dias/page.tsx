@@ -1,8 +1,12 @@
+"use client";
+
+import { type FormEvent, useState } from "react";
 import {
   missionVision,
   todosLosDiasChurch,
   volunteerAreas,
 } from "@/lib/churches/todos-los-dias";
+import { createClient } from "@/lib/supabase/client";
 
 const churchAddress = "1310 E Lincoln Ave, Orange, CA 92865";
 
@@ -88,6 +92,22 @@ const upcomingAnnouncements = [
     accent: "pink",
   },
 ];
+
+async function getTodosLosDiasChurchId() {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("churches")
+    .select("id")
+    .eq("slug", "todos-los-dias")
+    .single();
+
+  if (error || !data) {
+    throw new Error("Could not find church record.");
+  }
+
+  return data.id;
+}
 
 export default function TodosLosDiasPage() {
   return (
@@ -935,13 +955,67 @@ function SimpleForm({
   button: string;
   color: "navy" | "blue";
 }) {
+  const [status, setStatus] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const buttonClass =
     color === "navy"
       ? "bg-[#071A33] hover:bg-[#164B8F]"
       : "bg-[#164B8F] hover:bg-[#0E356B]";
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setIsSubmitting(true);
+    setStatus("");
+
+    const formData = new FormData(event.currentTarget);
+    const fullName = String(formData.get("full_name") || "").trim();
+    const phone = String(formData.get("phone") || "").trim();
+    const message = String(formData.get("message") || "").trim();
+
+    if (!fullName) {
+      setStatus("Por favor escribe tu nombre.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const churchId = await getTodosLosDiasChurchId();
+
+      if (id === "oracion") {
+        const { error } = await supabase.from("prayer_requests").insert({
+          church_id: churchId,
+          full_name: fullName,
+          phone,
+          prayer_request: message || "Sin mensaje",
+        });
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("visitor_submissions").insert({
+          church_id: churchId,
+          full_name: fullName,
+          phone,
+          message,
+        });
+
+        if (error) throw error;
+      }
+
+      event.currentTarget.reset();
+      setStatus("Listo. Tu información fue enviada.");
+    } catch (error) {
+      console.error(error);
+      setStatus("Hubo un error. Intenta otra vez.");
+    }
+
+    setIsSubmitting(false);
+  }
+
   return (
-    <form id={id} className="bg-white p-7 shadow-sm">
+    <form id={id} onSubmit={handleSubmit} className="bg-white p-7 shadow-sm">
       <h3 className="text-4xl font-black text-[#071A33]">{title}</h3>
       <p className="mt-3 text-lg font-medium leading-8 text-[#52657D]">
         {description}
@@ -949,25 +1023,33 @@ function SimpleForm({
 
       <div className="mt-6 space-y-4">
         <input
+          name="full_name"
           placeholder="Nombre completo"
           className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
         />
 
         <input
+          name="phone"
           placeholder="Teléfono"
           className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
         />
 
         <textarea
+          name="message"
           placeholder="Mensaje"
           className="min-h-28 w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
         />
 
+        {status ? (
+          <p className="text-sm font-bold text-[#164B8F]">{status}</p>
+        ) : null}
+
         <button
-          type="button"
-          className={`w-full px-6 py-4 text-lg font-black text-white ${buttonClass}`}
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full px-6 py-4 text-lg font-black text-white disabled:opacity-60 ${buttonClass}`}
         >
-          {button}
+          {isSubmitting ? "Enviando..." : button}
         </button>
       </div>
     </form>
@@ -975,8 +1057,51 @@ function SimpleForm({
 }
 
 function VolunteerForm() {
+  const [status, setStatus] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setIsSubmitting(true);
+    setStatus("");
+
+    const formData = new FormData(event.currentTarget);
+    const fullName = String(formData.get("full_name") || "").trim();
+    const contact = String(formData.get("contact") || "").trim();
+    const area = String(formData.get("area") || "").trim();
+
+    if (!fullName) {
+      setStatus("Por favor escribe tu nombre.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const churchId = await getTodosLosDiasChurchId();
+
+      const { error } = await supabase.from("volunteer_signups").insert({
+        church_id: churchId,
+        full_name: fullName,
+        phone: contact,
+        area,
+      });
+
+      if (error) throw error;
+
+      event.currentTarget.reset();
+      setStatus("Listo. Tu información fue enviada.");
+    } catch (error) {
+      console.error(error);
+      setStatus("Hubo un error. Intenta otra vez.");
+    }
+
+    setIsSubmitting(false);
+  }
+
   return (
-    <form id="servir" className="bg-white p-7 shadow-sm">
+    <form id="servir" onSubmit={handleSubmit} className="bg-white p-7 shadow-sm">
       <h3 className="text-4xl font-black text-[#071A33]">Quiero Servir</h3>
       <p className="mt-3 text-lg font-medium leading-8 text-[#52657D]">
         Déjanos saber en qué área te gustaría apoyar.
@@ -984,27 +1109,39 @@ function VolunteerForm() {
 
       <div className="mt-6 space-y-4">
         <input
+          name="full_name"
           placeholder="Nombre completo"
           className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
         />
 
         <input
+          name="contact"
           placeholder="Teléfono o correo"
           className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
         />
 
-        <select className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]">
-          <option>Área donde deseas servir</option>
+        <select
+          name="area"
+          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
+        >
+          <option value="">Área donde deseas servir</option>
           {volunteerAreas.map((area) => (
-            <option key={area}>{area}</option>
+            <option key={area} value={area}>
+              {area}
+            </option>
           ))}
         </select>
 
+        {status ? (
+          <p className="text-sm font-bold text-[#164B8F]">{status}</p>
+        ) : null}
+
         <button
-          type="button"
-          className="w-full bg-[#B1182D] px-6 py-4 text-lg font-black text-white hover:bg-[#8F1324]"
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-[#B1182D] px-6 py-4 text-lg font-black text-white hover:bg-[#8F1324] disabled:opacity-60"
         >
-          Enviar
+          {isSubmitting ? "Enviando..." : "Enviar"}
         </button>
       </div>
     </form>
