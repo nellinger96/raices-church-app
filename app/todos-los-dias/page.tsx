@@ -8,6 +8,8 @@ import {
 } from "@/lib/churches/todos-los-dias";
 import { createClient } from "@/lib/supabase/client";
 
+type ActionFormType = "visitor" | "prayer" | "volunteer";
+
 const churchAddress = "1310 E Lincoln Ave, Orange, CA 92865";
 
 const googleMapsUrl =
@@ -44,6 +46,22 @@ const heroSlides = [
     image: "/todos-los-dias/Mujeres.png",
     alt: "Ministerio de mujeres",
   },
+];
+
+const ministryLinks = [
+  { name: "Evangelismo", href: "/todos-los-dias/ministerios/evangelismo" },
+  {
+    name: "Estudio Bíblico",
+    href: "/todos-los-dias/ministerios/estudio-biblico",
+  },
+  { name: "Mujeres", href: "/todos-los-dias/ministerios/mujeres" },
+  {
+    name: "Escuela Dominical",
+    href: "/todos-los-dias/ministerios/escuela-dominical",
+  },
+  { name: "Oración", href: "/todos-los-dias/ministerios/oracion" },
+  { name: "Jóvenes", href: "/todos-los-dias/ministerios/jovenes" },
+  { name: "Alabanza", href: "/todos-los-dias/ministerios/alabanza" },
 ];
 
 const upcomingAnnouncements = [
@@ -110,6 +128,19 @@ async function getTodosLosDiasChurchId() {
 }
 
 export default function TodosLosDiasPage() {
+  const [activeForm, setActiveForm] = useState<ActionFormType | null>(null);
+
+  function openForm(formType: ActionFormType) {
+    setActiveForm(formType);
+
+    setTimeout(() => {
+      document.getElementById("formulario")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
+  }
+
   return (
     <main
       className="min-h-screen text-[#071A33]"
@@ -137,13 +168,10 @@ export default function TodosLosDiasPage() {
           ))}
 
           <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(7,26,51,0.94),rgba(7,26,51,0.58),rgba(7,26,51,0.92))]" />
-
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(22,75,143,0.55),transparent_34%),radial-gradient(circle_at_88%_70%,rgba(177,24,45,0.35),transparent_32%)]" />
-
           <div className="absolute inset-0 opacity-20">
             <div className="h-full w-full bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:64px_64px]" />
           </div>
-
           <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#F5F8FC] via-[#F5F8FC]/40 to-transparent" />
         </div>
 
@@ -173,20 +201,20 @@ export default function TodosLosDiasPage() {
           `}
         </style>
 
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-6">
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-4 sm:px-6">
           <header className="flex items-center justify-between py-5">
             <a href="/" className="flex items-center gap-3">
               <img
                 src={todosLosDiasChurch.logo}
                 alt={todosLosDiasChurch.name}
-                className="h-16 w-16 rounded-full bg-white object-contain p-1 shadow-lg"
+                className="h-14 w-14 rounded-full bg-white object-contain p-1 shadow-lg sm:h-16 sm:w-16"
               />
 
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.3em] text-[#BBD7FF]">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#BBD7FF] sm:text-xs sm:tracking-[0.3em]">
                   Iglesia en Español
                 </p>
-                <h1 className="text-lg font-black">
+                <h1 className="text-base font-black sm:text-lg">
                   {todosLosDiasChurch.shortName}
                 </h1>
               </div>
@@ -196,6 +224,25 @@ export default function TodosLosDiasPage() {
               <a href="#anuncios" className="hover:text-[#BBD7FF]">
                 Anuncios
               </a>
+
+              <div className="group relative">
+                <button className="font-bold hover:text-[#BBD7FF]">
+                  Ministerios ▾
+                </button>
+
+                <div className="invisible absolute right-0 top-full z-50 mt-3 w-64 border border-white/15 bg-white p-2 text-[#071A33] opacity-0 shadow-2xl transition group-hover:visible group-hover:opacity-100">
+                  {ministryLinks.map((ministry) => (
+                    <a
+                      key={ministry.href}
+                      href={ministry.href}
+                      className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF] hover:text-[#164B8F]"
+                    >
+                      {ministry.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
               <a href="#pastor" className="hover:text-[#BBD7FF]">
                 Pastor
               </a>
@@ -209,7 +256,7 @@ export default function TodosLosDiasPage() {
 
             <a
               href="#conectar"
-              className="rounded-full bg-white px-5 py-3 text-sm font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF]"
+              className="rounded-full bg-white px-4 py-3 text-xs font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF] sm:px-5 sm:text-sm"
             >
               Soy Nuevo
             </a>
@@ -217,44 +264,74 @@ export default function TodosLosDiasPage() {
 
           <div className="flex flex-1 items-center pb-16 pt-10">
             <div className="max-w-5xl">
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#BBD7FF] sm:text-sm sm:tracking-[0.35em]">
                 Una iglesia para la comunidad hispana
               </p>
 
-              <h2 className="mt-5 max-w-5xl text-6xl font-black leading-[0.95] tracking-tight md:text-8xl">
+              <h2 className="mt-5 max-w-5xl text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl md:text-8xl">
                 Bienvenido a casa.
               </h2>
 
-              <p className="mt-7 max-w-2xl text-xl font-medium leading-9 text-white/85 md:text-2xl">
+              <p className="mt-7 max-w-2xl text-lg font-medium leading-8 text-white/85 sm:text-xl sm:leading-9 md:text-2xl">
                 En Iglesia de Todos los Días queremos que tú y tu familia se
                 sientan amados, recibidos y acompañados en su caminar con Dios.
               </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#conectar"
+                  className="rounded-full bg-white px-6 py-4 text-center text-sm font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF]"
+                >
+                  Conectarme
+                </a>
+
+                <div className="relative md:hidden">
+                  <details className="group rounded-full border border-white/30 bg-white/10">
+                    <summary className="cursor-pointer list-none px-6 py-4 text-center text-sm font-black text-white">
+                      Ministerios
+                    </summary>
+                    <div className="mt-2 overflow-hidden bg-white p-2 text-left text-[#071A33] shadow-xl">
+                      {ministryLinks.map((ministry) => (
+                        <a
+                          key={ministry.href}
+                          href={ministry.href}
+                          className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF]"
+                        >
+                          {ministry.name}
+                        </a>
+                      ))}
+                    </div>
+                  </details>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* SERVICE BANNER */}
           <div className="relative mb-10 overflow-hidden border border-white/25 bg-white/58 text-[#071A33] shadow-2xl backdrop-blur-md">
             <div className="grid md:grid-cols-[1fr_1.2fr_0.8fr]">
-              <div className="border-b border-white/35 p-6 md:border-b-0 md:border-r">
-                <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
+              <div className="border-b border-white/35 p-5 sm:p-6 md:border-b-0 md:border-r">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F] sm:text-sm">
                   Nos reunimos
                 </p>
 
-                <h3 className="mt-2 text-4xl font-black">Domingo</h3>
+                <h3 className="mt-2 text-3xl font-black sm:text-4xl">
+                  Domingo
+                </h3>
 
                 <div className="mt-4 space-y-2">
-                  <p className="text-lg font-black text-[#071A33]">
+                  <p className="text-base font-black text-[#071A33] sm:text-lg">
                     English Service · 10:00 AM
                   </p>
 
-                  <p className="text-lg font-black text-[#B1182D]">
+                  <p className="text-base font-black text-[#B1182D] sm:text-lg">
                     Servicio en Español · 1:00 PM
                   </p>
                 </div>
               </div>
 
-              <div className="border-b border-white/35 p-6 md:border-b-0 md:border-r">
-                <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
+              <div className="border-b border-white/35 p-5 sm:p-6 md:border-b-0 md:border-r">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F] sm:text-sm">
                   Lugar
                 </p>
 
@@ -269,7 +346,9 @@ export default function TodosLosDiasPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-2xl font-black">The Main Place</h3>
+                      <h3 className="text-xl font-black sm:text-2xl">
+                        The Main Place
+                      </h3>
                       <p className="text-sm font-bold text-[#52657D]">
                         English Service · 10:00 AM
                       </p>
@@ -286,7 +365,7 @@ export default function TodosLosDiasPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-2xl font-black">
+                      <h3 className="text-xl font-black sm:text-2xl">
                         Iglesia de Todos los Días
                       </h3>
                       <p className="text-sm font-bold text-[#B1182D]">
@@ -300,7 +379,7 @@ export default function TodosLosDiasPage() {
                       href={googleMapsUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="block text-base font-black leading-7 text-[#071A33] underline decoration-[#164B8F] decoration-2 underline-offset-4 hover:text-[#B1182D]"
+                      className="block text-sm font-black leading-7 text-[#071A33] underline decoration-[#164B8F] decoration-2 underline-offset-4 hover:text-[#B1182D] sm:text-base"
                     >
                       {churchAddress}
                     </a>
@@ -341,31 +420,34 @@ export default function TodosLosDiasPage() {
 
       {/* MOBILE QUICK ACTION BAR */}
       <div className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-3 border-t border-white/20 bg-[#071A33]/95 text-center text-xs font-black text-white shadow-2xl backdrop-blur md:hidden">
-        <a href="#conectar" className="px-2 py-3">
+        <button onClick={() => openForm("visitor")} className="px-2 py-3">
           Soy Nuevo
-        </a>
-        <a href="#oracion" className="border-x border-white/10 px-2 py-3">
+        </button>
+        <button
+          onClick={() => openForm("prayer")}
+          className="border-x border-white/10 px-2 py-3"
+        >
           Oración
-        </a>
+        </button>
         <a href="#donar" className="px-2 py-3">
           Donar
         </a>
       </div>
 
       {/* ANNOUNCEMENTS */}
-      <section id="anuncios" className="px-6 py-20">
+      <section id="anuncios" className="px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
                 Lo más importante
               </p>
-              <h2 className="mt-2 text-5xl font-black leading-tight md:text-7xl">
+              <h2 className="mt-2 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
                 Anuncios y eventos
               </h2>
             </div>
 
-            <p className="max-w-lg text-lg font-medium leading-8 text-[#52657D]">
+            <p className="max-w-lg text-base font-medium leading-8 text-[#52657D] sm:text-lg">
               Lee la información principal aquí y toca cada volante para verlo
               completo.
             </p>
@@ -392,18 +474,18 @@ export default function TodosLosDiasPage() {
 
         <div className="absolute inset-0 bg-gradient-to-r from-[#071A33]/95 via-[#071A33]/65 to-[#071A33]/20" />
 
-        <div className="absolute inset-0 flex items-center px-6">
+        <div className="absolute inset-0 flex items-center px-4 sm:px-6">
           <div className="mx-auto w-full max-w-7xl">
             <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
                 Una familia en Cristo
               </p>
 
-              <h2 className="mt-4 text-5xl font-black leading-tight md:text-7xl">
+              <h2 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
                 Dios está formando algo hermoso.
               </h2>
 
-              <p className="mt-6 max-w-2xl text-xl font-medium leading-9 text-white/80">
+              <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-white/80 sm:text-xl sm:leading-9">
                 Iglesia de Todos los Días existe para amar, servir, discipular y
                 caminar con la comunidad hispana todos los días.
               </p>
@@ -413,38 +495,38 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* FIRST-TIME VISITOR */}
-      <section className="relative overflow-hidden px-6 py-24">
+      <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24">
         <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-[radial-gradient(circle_at_center,rgba(22,75,143,0.20),transparent_35%),linear-gradient(135deg,rgba(7,26,51,0.08),rgba(187,215,255,0.45))] lg:block" />
 
         <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
               ¿Primera vez?
             </p>
 
-            <h2 className="mt-4 text-5xl font-black leading-tight md:text-7xl">
+            <h2 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
               Ven con tu familia. Te esperamos.
             </h2>
 
-            <p className="mt-6 max-w-2xl text-xl font-medium leading-9 text-[#52657D]">
+            <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
               No tienes que saber qué hacer ni a dónde ir. Queremos recibirte,
               conocerte y ayudarte a sentirte en casa.
             </p>
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-              <a
-                href="#conectar"
+              <button
+                onClick={() => openForm("visitor")}
                 className="rounded-full bg-[#071A33] px-8 py-4 text-center text-lg font-black text-white hover:bg-[#164B8F]"
               >
                 Avisar que voy
-              </a>
+              </button>
 
-              <a
-                href="#oracion"
+              <button
+                onClick={() => openForm("prayer")}
                 className="rounded-full border-2 border-[#071A33] px-8 py-4 text-center text-lg font-black text-[#071A33] hover:bg-white"
               >
                 Pedir oración
-              </a>
+              </button>
             </div>
           </div>
 
@@ -457,11 +539,11 @@ export default function TodosLosDiasPage() {
 
             <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/85 via-[#071A33]/25 to-transparent" />
 
-            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-[#BBD7FF]">
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-[#BBD7FF] sm:text-sm">
                 Comunidad
               </p>
-              <h3 className="mt-3 text-4xl font-black">
+              <h3 className="mt-3 text-3xl font-black sm:text-4xl">
                 Una iglesia para toda la familia
               </h3>
             </div>
@@ -470,33 +552,33 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* PASTOR BIO */}
-      <section id="pastor" className="bg-white px-6 py-24">
+      <section id="pastor" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="relative min-h-[460px] overflow-hidden bg-[#071A33] shadow-xl sm:translate-y-8">
+            <div className="relative min-h-[380px] overflow-hidden bg-[#071A33] shadow-xl sm:min-h-[460px] sm:translate-y-8">
               <img
                 src={churchPhotos.pastorWife}
                 alt="Pastor Socrates y su esposa"
-                className="h-full min-h-[460px] w-full object-cover"
+                className="h-full min-h-[380px] w-full object-cover sm:min-h-[460px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/65 to-transparent" />
             </div>
 
             <div className="space-y-4">
-              <div className="relative min-h-[270px] overflow-hidden bg-[#071A33] shadow-xl">
+              <div className="relative min-h-[260px] overflow-hidden bg-[#071A33] shadow-xl sm:min-h-[270px]">
                 <img
                   src={churchPhotos.pastorFamily}
                   alt="Familia del Pastor Socrates"
-                  className="h-full min-h-[270px] w-full object-cover"
+                  className="h-full min-h-[260px] w-full object-cover sm:min-h-[270px]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/60 to-transparent" />
               </div>
 
               <div className="bg-[#071A33] p-7 text-white shadow-xl">
-                <p className="text-sm font-black uppercase tracking-[0.3em] text-[#BBD7FF]">
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-[#BBD7FF] sm:text-sm">
                   Liderazgo
                 </p>
-                <h3 className="mt-3 text-3xl font-black">
+                <h3 className="mt-3 text-2xl font-black sm:text-3xl">
                   Sirviendo a Dios y a la comunidad.
                 </h3>
               </div>
@@ -504,22 +586,22 @@ export default function TodosLosDiasPage() {
           </div>
 
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
               Conoce al Pastor
             </p>
 
-            <h2 className="mt-4 text-5xl font-black leading-tight md:text-7xl">
+            <h2 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
               Pastor Socrates Lopez
             </h2>
 
-            <p className="mt-6 text-xl font-medium leading-9 text-[#52657D]">
+            <p className="mt-6 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
               Pastor Socrates sirve a la comunidad con un corazón pastoral,
               familiar y cercano. Su deseo es que cada persona que llegue a
               Iglesia de Todos los Días pueda sentirse bienvenida, amada y
               acompañada en su caminar con Dios.
             </p>
 
-            <p className="mt-5 text-xl font-medium leading-9 text-[#52657D]">
+            <p className="mt-5 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
               Junto a su familia, busca levantar una iglesia centrada en la
               Palabra de Dios, la oración, la comunidad y el servicio a las
               familias hispanas.
@@ -552,13 +634,13 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* PHOTOS */}
-      <section className="px-6 py-20">
+      <section className="px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8">
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
               Comunidad
             </p>
-            <h2 className="mt-2 text-5xl font-black md:text-6xl">
+            <h2 className="mt-2 text-4xl font-black sm:text-5xl md:text-6xl">
               Vida de la iglesia
             </h2>
           </div>
@@ -573,96 +655,85 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* BIG ACTIONS */}
-      <section id="conectar" className="bg-[#071A33] px-6 py-20 text-white">
+      <section id="conectar" className="bg-[#071A33] px-4 py-16 text-white sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
               ¿Qué necesitas hoy?
             </p>
-            <h2 className="mt-3 text-5xl font-black md:text-6xl">
+            <h2 className="mt-3 text-4xl font-black sm:text-5xl md:text-6xl">
               Estamos aquí para ti.
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
-            <a
-              href="#soy-nuevo-form"
-              className="group min-h-64 bg-white p-8 text-[#071A33] transition hover:scale-[1.01]"
-            >
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-[#164B8F]">
-                Nuevo visitante
-              </p>
-              <h3 className="mt-4 text-5xl font-black leading-none">
-                Soy Nuevo
-              </h3>
-              <p className="mt-6 text-lg font-medium leading-8 text-[#52657D]">
-                Queremos conocerte y ayudarte a conectarte con la iglesia.
-              </p>
-            </a>
+          <div className="mt-10 grid gap-4 md:grid-cols-3 md:gap-5">
+            <ActionCard
+              eyebrow="Nuevo visitante"
+              title="Soy Nuevo"
+              description="Queremos conocerte y ayudarte a conectarte con la iglesia."
+              active={activeForm === "visitor"}
+              variant="white"
+              onClick={() => openForm("visitor")}
+            />
 
-            <a
-              href="#oracion"
-              className="group min-h-64 bg-[#164B8F] p-8 text-white transition hover:scale-[1.01]"
-            >
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-white/70">
-                Necesito ayuda
-              </p>
-              <h3 className="mt-4 text-5xl font-black leading-none">
-                Oración
-              </h3>
-              <p className="mt-6 text-lg font-medium leading-8 text-white/80">
-                Comparte tu petición. Queremos orar contigo.
-              </p>
-            </a>
+            <ActionCard
+              eyebrow="Necesito ayuda"
+              title="Oración"
+              description="Comparte tu petición. Queremos orar contigo."
+              active={activeForm === "prayer"}
+              variant="blue"
+              onClick={() => openForm("prayer")}
+            />
 
-            <a
-              href="#servir"
-              className="group min-h-64 bg-[#B1182D] p-8 text-white transition hover:scale-[1.01]"
-            >
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-white/70">
-                Quiero apoyar
-              </p>
-              <h3 className="mt-4 text-5xl font-black leading-none">
-                Servir
-              </h3>
-              <p className="mt-6 text-lg font-medium leading-8 text-white/80">
-                Usa tus dones para bendecir a otros.
-              </p>
-            </a>
+            <ActionCard
+              eyebrow="Quiero apoyar"
+              title="Servir"
+              description="Usa tus dones para bendecir a otros."
+              active={activeForm === "volunteer"}
+              variant="red"
+              onClick={() => openForm("volunteer")}
+            />
+          </div>
+
+          <div id="formulario" className="scroll-mt-28">
+            {activeForm ? (
+              <div className="mt-8 max-w-3xl">
+                {activeForm === "visitor" ? (
+                  <SimpleForm
+                    id="soy-nuevo-form"
+                    title="Soy Nuevo"
+                    description="Déjanos tu información y alguien de la iglesia podrá saludarte."
+                    button="Enviar"
+                    color="navy"
+                    formType="visitor"
+                  />
+                ) : null}
+
+                {activeForm === "prayer" ? (
+                  <SimpleForm
+                    id="oracion"
+                    title="Pedir Oración"
+                    description="Escribe tu petición. Queremos orar por ti y tu familia."
+                    button="Enviar petición"
+                    color="blue"
+                    formType="prayer"
+                  />
+                ) : null}
+
+                {activeForm === "volunteer" ? <VolunteerForm /> : null}
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
 
-      {/* FORMS */}
-      <section className="px-6 py-20">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
-          <SimpleForm
-            id="soy-nuevo-form"
-            title="Soy Nuevo"
-            description="Déjanos tu información y alguien de la iglesia podrá saludarte."
-            button="Enviar"
-            color="navy"
-          />
-
-          <SimpleForm
-            id="oracion"
-            title="Pedir Oración"
-            description="Escribe tu petición. Queremos orar por ti y tu familia."
-            button="Enviar petición"
-            color="blue"
-          />
-
-          <VolunteerForm />
-        </div>
-      </section>
-
       {/* MISSION / VISION */}
-      <section id="vision" className="bg-white px-6 py-24">
+      <section id="vision" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
             Nuestra identidad
           </p>
-          <h2 className="mt-3 max-w-4xl text-5xl font-black leading-tight md:text-7xl">
+          <h2 className="mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
             Una iglesia que vive la Palabra todos los días.
           </h2>
 
@@ -672,15 +743,15 @@ export default function TodosLosDiasPage() {
                 key={item.label}
                 className="border-t border-[#D9E5F5] pt-8 md:grid md:grid-cols-[260px_1fr] md:gap-10"
               >
-                <p className="text-sm font-black uppercase tracking-[0.3em] text-[#164B8F]">
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-[#164B8F] sm:text-sm">
                   {item.label}
                 </p>
 
                 <div>
-                  <h3 className="text-4xl font-black text-[#071A33]">
+                  <h3 className="text-3xl font-black text-[#071A33] sm:text-4xl">
                     {item.title}
                   </h3>
-                  <p className="mt-4 max-w-4xl text-xl font-medium leading-9 text-[#52657D]">
+                  <p className="mt-4 max-w-4xl text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
                     {item.description}
                   </p>
                 </div>
@@ -691,16 +762,16 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* VIDEOS */}
-      <section className="bg-[#F5F8FC] px-6 py-20">
+      <section className="bg-[#F5F8FC] px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
               Mensajes
             </p>
-            <h2 className="mt-3 text-5xl font-black md:text-6xl">
+            <h2 className="mt-3 text-4xl font-black sm:text-5xl md:text-6xl">
               Mira enseñanzas en YouTube.
             </h2>
-            <p className="mt-5 text-xl font-medium leading-9 text-[#52657D]">
+            <p className="mt-5 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
               Visita el canal de Pastor Socrates para ver mensajes y contenido
               para fortalecer tu fe.
             </p>
@@ -715,7 +786,7 @@ export default function TodosLosDiasPage() {
             </a>
           </div>
 
-          <div className="relative min-h-[420px] overflow-hidden bg-[#071A33] p-8 text-white">
+          <div className="relative min-h-[360px] overflow-hidden bg-[#071A33] p-8 text-white sm:min-h-[420px]">
             <img
               src={churchPhotos.pm}
               alt="Pastor Socrates mensajes"
@@ -724,10 +795,12 @@ export default function TodosLosDiasPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#071A33]/90 to-[#071A33]/35" />
 
             <div className="relative z-10">
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
                 Canal oficial
               </p>
-              <h3 className="mt-4 text-5xl font-black">Pastor Socrates</h3>
+              <h3 className="mt-4 text-4xl font-black sm:text-5xl">
+                Pastor Socrates
+              </h3>
               <p className="mt-5 max-w-xl text-lg font-medium leading-8 text-white/80">
                 Cuando tengamos videos específicos, aquí se mostrarán como
                 mensajes destacados.
@@ -738,26 +811,28 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* DONATE */}
-      <section id="donar" className="bg-[#071A33] px-6 py-20 text-white">
+      <section id="donar" className="bg-[#071A33] px-4 py-16 text-white sm:px-6 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
               Dar / Donar
             </p>
-            <h2 className="mt-3 text-5xl font-black leading-tight md:text-7xl">
+            <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
               Apoya la misión.
             </h2>
-            <p className="mt-6 max-w-2xl text-xl font-medium leading-9 text-white/85">
+            <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-white/85 sm:text-xl sm:leading-9">
               Tus ofrendas ayudan a la iglesia a servir, discipular y alcanzar
               familias con el amor de Cristo.
             </p>
           </div>
 
-          <div className="bg-white p-8 text-[#071A33]">
-            <p className="text-sm font-black uppercase tracking-[0.3em] text-[#164B8F]">
+          <div className="bg-white p-6 text-[#071A33] sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#164B8F] sm:text-sm">
               Zelle
             </p>
-            <h3 className="mt-3 text-4xl font-black">Dar por Zelle</h3>
+            <h3 className="mt-3 text-3xl font-black sm:text-4xl">
+              Dar por Zelle
+            </h3>
             <p className="mt-4 text-lg font-medium leading-8 text-[#52657D]">
               Aquí irá el correo, teléfono o código QR oficial de la iglesia.
             </p>
@@ -772,9 +847,9 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* QR */}
-      <section className="px-6 py-20">
+      <section className="px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div className="flex h-80 items-center justify-center bg-[#071A33] text-white">
+          <div className="flex h-72 items-center justify-center bg-[#071A33] text-white sm:h-80">
             <div className="text-center">
               <p className="text-7xl font-black">QR</p>
               <p className="mt-2 text-lg font-bold text-white/70">
@@ -784,13 +859,13 @@ export default function TodosLosDiasPage() {
           </div>
 
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
               Acceso rápido
             </p>
-            <h2 className="mt-3 text-5xl font-black leading-tight md:text-6xl">
+            <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
               Guarda la iglesia en tu teléfono.
             </h2>
-            <p className="mt-5 max-w-2xl text-xl font-medium leading-9 text-[#52657D]">
+            <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
               Los visitantes podrán escanear un QR para abrir esta página y
               tener acceso rápido a anuncios, eventos, oración, voluntariado y
               donaciones.
@@ -800,7 +875,7 @@ export default function TodosLosDiasPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#071A33] px-6 py-10 text-white">
+      <footer className="bg-[#071A33] px-4 py-10 pb-20 text-white sm:px-6 md:pb-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <img
@@ -827,6 +902,61 @@ export default function TodosLosDiasPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+function ActionCard({
+  eyebrow,
+  title,
+  description,
+  active,
+  variant,
+  onClick,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  active: boolean;
+  variant: "white" | "blue" | "red";
+  onClick: () => void;
+}) {
+  const variantClass =
+    variant === "white"
+      ? "bg-white text-[#071A33]"
+      : variant === "blue"
+        ? "bg-[#164B8F] text-white"
+        : "bg-[#B1182D] text-white";
+
+  const eyebrowClass =
+    variant === "white" ? "text-[#164B8F]" : "text-white/70";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group min-h-56 p-6 text-left transition hover:scale-[1.01] sm:min-h-64 sm:p-8 ${variantClass} ${
+        active ? "ring-4 ring-[#BBD7FF]" : ""
+      }`}
+    >
+      <p
+        className={`text-xs font-black uppercase tracking-[0.3em] sm:text-sm ${eyebrowClass}`}
+      >
+        {eyebrow}
+      </p>
+      <h3 className="mt-4 text-4xl font-black leading-none sm:text-5xl">
+        {title}
+      </h3>
+      <p
+        className={`mt-6 text-base font-medium leading-8 sm:text-lg ${
+          variant === "white" ? "text-[#52657D]" : "text-white/80"
+        }`}
+      >
+        {description}
+      </p>
+      <p className="mt-6 text-sm font-black">
+        {active ? "Formulario abierto" : "Toca para abrir"}
+      </p>
+    </button>
   );
 }
 
@@ -859,7 +989,7 @@ function AnnouncementCard({
         href={announcement.flyer}
         target="_blank"
         rel="noreferrer"
-        className="group relative flex min-h-[520px] items-center justify-center overflow-hidden bg-white"
+        className="group relative flex min-h-[360px] items-center justify-center overflow-hidden bg-white sm:min-h-[520px]"
       >
         <img
           src={announcement.flyer}
@@ -874,19 +1004,19 @@ function AnnouncementCard({
         </div>
       </a>
 
-      <div className="flex flex-col justify-between p-7">
+      <div className="flex flex-col justify-between p-6 sm:p-7">
         <div>
           <p
-            className={`inline-flex border-l-4 pl-3 text-sm font-black uppercase tracking-[0.25em] ${accentClass}`}
+            className={`inline-flex border-l-4 pl-3 text-xs font-black uppercase tracking-[0.25em] sm:text-sm ${accentClass}`}
           >
             {announcement.category}
           </p>
 
-          <h3 className="mt-5 text-4xl font-black leading-tight text-[#071A33]">
+          <h3 className="mt-5 text-3xl font-black leading-tight text-[#071A33] sm:text-4xl">
             {announcement.title}
           </h3>
 
-          <div className="mt-5 space-y-3 text-lg font-bold text-[#52657D]">
+          <div className="mt-5 space-y-3 text-base font-bold text-[#52657D] sm:text-lg">
             <p>
               <span className="text-[#071A33]">Fecha:</span>{" "}
               {announcement.date}
@@ -901,7 +1031,7 @@ function AnnouncementCard({
             </p>
           </div>
 
-          <p className="mt-5 text-lg font-medium leading-8 text-[#52657D]">
+          <p className="mt-5 text-base font-medium leading-8 text-[#52657D] sm:text-lg">
             {announcement.description}
           </p>
         </div>
@@ -948,12 +1078,14 @@ function SimpleForm({
   description,
   button,
   color,
+  formType,
 }: {
   id: string;
   title: string;
   description: string;
   button: string;
   color: "navy" | "blue";
+  formType: "visitor" | "prayer";
 }) {
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -966,12 +1098,15 @@ function SimpleForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const form = event.currentTarget;
+
     setIsSubmitting(true);
     setStatus("");
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const fullName = String(formData.get("full_name") || "").trim();
     const phone = String(formData.get("phone") || "").trim();
+    const email = String(formData.get("email") || "").trim();
     const message = String(formData.get("message") || "").trim();
 
     if (!fullName) {
@@ -980,15 +1115,22 @@ function SimpleForm({
       return;
     }
 
+    if (!phone && !email) {
+      setStatus("Por favor agrega teléfono o correo.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const supabase = createClient();
       const churchId = await getTodosLosDiasChurchId();
 
-      if (id === "oracion") {
+      if (formType === "prayer") {
         const { error } = await supabase.from("prayer_requests").insert({
           church_id: churchId,
           full_name: fullName,
           phone,
+          email,
           prayer_request: message || "Sin mensaje",
         });
 
@@ -998,13 +1140,14 @@ function SimpleForm({
           church_id: churchId,
           full_name: fullName,
           phone,
+          email,
           message,
         });
 
         if (error) throw error;
       }
 
-      event.currentTarget.reset();
+      form.reset();
       setStatus("Listo. Tu información fue enviada.");
     } catch (error) {
       console.error(error);
@@ -1015,33 +1158,67 @@ function SimpleForm({
   }
 
   return (
-    <form id={id} onSubmit={handleSubmit} className="bg-white p-7 shadow-sm">
-      <h3 className="text-4xl font-black text-[#071A33]">{title}</h3>
-      <p className="mt-3 text-lg font-medium leading-8 text-[#52657D]">
+    <form id={id} onSubmit={handleSubmit} className="bg-white p-5 text-[#071A33] shadow-xl sm:p-7">
+      <h3 className="text-3xl font-black sm:text-4xl">{title}</h3>
+      <p className="mt-3 text-base font-medium leading-8 text-[#52657D] sm:text-lg">
         {description}
       </p>
 
-      <div className="mt-6 space-y-4">
-        <input
-          name="full_name"
-          placeholder="Nombre completo"
-          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        />
+      <div className="mt-6 grid gap-5">
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Nombre completo
+          </span>
+          <input
+            name="full_name"
+            placeholder="Ej. María González"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
-        <input
-          name="phone"
-          placeholder="Teléfono"
-          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Teléfono
+          </span>
+          <input
+            name="phone"
+            type="tel"
+            placeholder="Ej. (714) 555-1234"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
-        <textarea
-          name="message"
-          placeholder="Mensaje"
-          className="min-h-28 w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Correo electrónico
+          </span>
+          <input
+            name="email"
+            type="email"
+            placeholder="Ej. maria@email.com"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Mensaje
+          </span>
+          <textarea
+            name="message"
+            placeholder={
+              formType === "prayer"
+                ? "Escribe tu petición de oración..."
+                : "Cuéntanos cómo podemos ayudarte..."
+            }
+            className="mt-2 min-h-32 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
         {status ? (
-          <p className="text-sm font-bold text-[#164B8F]">{status}</p>
+          <p className="rounded bg-[#EEF5FF] p-3 text-sm font-bold text-[#164B8F]">
+            {status}
+          </p>
         ) : null}
 
         <button
@@ -1063,16 +1240,26 @@ function VolunteerForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const form = event.currentTarget;
+
     setIsSubmitting(true);
     setStatus("");
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const fullName = String(formData.get("full_name") || "").trim();
     const contact = String(formData.get("contact") || "").trim();
+    const email = String(formData.get("email") || "").trim();
     const area = String(formData.get("area") || "").trim();
+    const message = String(formData.get("message") || "").trim();
 
     if (!fullName) {
       setStatus("Por favor escribe tu nombre.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!contact && !email) {
+      setStatus("Por favor agrega teléfono o correo.");
       setIsSubmitting(false);
       return;
     }
@@ -1085,12 +1272,14 @@ function VolunteerForm() {
         church_id: churchId,
         full_name: fullName,
         phone: contact,
+        email,
         area,
+        message,
       });
 
       if (error) throw error;
 
-      event.currentTarget.reset();
+      form.reset();
       setStatus("Listo. Tu información fue enviada.");
     } catch (error) {
       console.error(error);
@@ -1101,39 +1290,80 @@ function VolunteerForm() {
   }
 
   return (
-    <form id="servir" onSubmit={handleSubmit} className="bg-white p-7 shadow-sm">
-      <h3 className="text-4xl font-black text-[#071A33]">Quiero Servir</h3>
-      <p className="mt-3 text-lg font-medium leading-8 text-[#52657D]">
+    <form id="servir" onSubmit={handleSubmit} className="bg-white p-5 text-[#071A33] shadow-xl sm:p-7">
+      <h3 className="text-3xl font-black sm:text-4xl">Quiero Servir</h3>
+      <p className="mt-3 text-base font-medium leading-8 text-[#52657D] sm:text-lg">
         Déjanos saber en qué área te gustaría apoyar.
       </p>
 
-      <div className="mt-6 space-y-4">
-        <input
-          name="full_name"
-          placeholder="Nombre completo"
-          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        />
+      <div className="mt-6 grid gap-5">
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Nombre completo
+          </span>
+          <input
+            name="full_name"
+            placeholder="Ej. José Ramírez"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
-        <input
-          name="contact"
-          placeholder="Teléfono o correo"
-          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Teléfono
+          </span>
+          <input
+            name="contact"
+            type="tel"
+            placeholder="Ej. (714) 555-1234"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
-        <select
-          name="area"
-          className="w-full border-b-2 border-[#D9E5F5] bg-transparent px-1 py-4 text-lg font-medium outline-none focus:border-[#164B8F]"
-        >
-          <option value="">Área donde deseas servir</option>
-          {volunteerAreas.map((area) => (
-            <option key={area} value={area}>
-              {area}
-            </option>
-          ))}
-        </select>
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Correo electrónico
+          </span>
+          <input
+            name="email"
+            type="email"
+            placeholder="Ej. jose@email.com"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Área donde deseas servir
+          </span>
+          <select
+            name="area"
+            className="mt-2 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          >
+            <option value="">Selecciona un área</option>
+            {volunteerAreas.map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#164B8F]">
+            Mensaje
+          </span>
+          <textarea
+            name="message"
+            placeholder="Cuéntanos cómo te gustaría servir..."
+            className="mt-2 min-h-32 w-full rounded-none border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-medium text-[#071A33] outline-none focus:border-[#164B8F] sm:text-lg"
+          />
+        </label>
 
         {status ? (
-          <p className="text-sm font-bold text-[#164B8F]">{status}</p>
+          <p className="rounded bg-[#EEF5FF] p-3 text-sm font-bold text-[#164B8F]">
+            {status}
+          </p>
         ) : null}
 
         <button

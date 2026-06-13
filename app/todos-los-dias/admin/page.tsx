@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -5,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 const CHURCH_SLUG = "todos-los-dias";
 const ADMIN_PATH = "/todos-los-dias/admin";
 const LOGIN_PATH = "/todos-los-dias/login";
+const PUBLIC_PATH = "/todos-los-dias";
 
 type Church = {
   id: string;
@@ -92,6 +94,7 @@ export default async function TodosLosDiasAdminPage() {
     visitorsResult,
     prayerResult,
     volunteersResult,
+    ministryInterestsResult,
     announcementsResult,
     eventsResult,
   ] = await Promise.all([
@@ -114,6 +117,12 @@ export default async function TodosLosDiasAdminPage() {
       .order("created_at", { ascending: false }),
 
     supabase
+      .from("ministry_interest_submissions")
+      .select("*, ministries(name, slug)")
+      .eq("church_id", church.id)
+      .order("created_at", { ascending: false }),
+
+    supabase
       .from("announcements")
       .select("*")
       .eq("church_id", church.id)
@@ -131,6 +140,7 @@ export default async function TodosLosDiasAdminPage() {
   const visitors = visitorsResult.data ?? [];
   const prayers = prayerResult.data ?? [];
   const volunteers = volunteersResult.data ?? [];
+  const ministryInterests = ministryInterestsResult.data ?? [];
   const announcements = announcementsResult.data ?? [];
   const events = eventsResult.data ?? [];
 
@@ -139,29 +149,33 @@ export default async function TodosLosDiasAdminPage() {
   const pendingVolunteers = volunteers.filter(
     (item) => item.status === "Pendiente",
   );
+  const pendingMinistryInterests = ministryInterests.filter(
+    (item) => item.status === "Pendiente",
+  );
 
   return (
     <main className="min-h-screen bg-[#F5F8FC] text-[#071A33]">
-      <header className="bg-[#071A33] px-6 py-8 text-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <header className="bg-[#071A33] px-4 py-8 text-white sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#BBD7FF]">
-              Raíces Pastor Dashboard
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
+              Panel Pastoral Raíces
             </p>
-            <h1 className="mt-3 text-5xl font-black leading-tight">
+            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-5xl">
               {church.display_name ?? church.name}
             </h1>
             <p className="mt-3 text-sm font-bold text-white/65">
-              Logged in as {admin.full_name ?? user.email} · Role: {admin.role}
+              Sesión iniciada como {admin.full_name ?? user.email} · Rol:{" "}
+              {admin.role}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <a
-              href="/todos-los-dias"
+              href={PUBLIC_PATH}
               className="bg-white px-5 py-3 text-sm font-black text-[#071A33] hover:bg-[#BBD7FF]"
             >
-              View Public Page
+              Ver página pública
             </a>
 
             <form action={signOut}>
@@ -169,118 +183,188 @@ export default async function TodosLosDiasAdminPage() {
                 type="submit"
                 className="border border-white/30 px-5 py-3 text-sm font-black text-white hover:bg-white/10"
               >
-                Sign Out
+                Cerrar sesión
               </button>
             </form>
           </div>
         </div>
       </header>
 
-      <section className="px-6 py-8">
-        <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
+      <section className="px-4 py-6 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-bold leading-7 text-[#52657D]">
+            Usa este panel para revisar formularios, dar seguimiento, cambiar
+            estados, agregar notas y eliminar registros que ya no necesites.
+          </p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <AdminNavLink href="#soy-nuevo" label="Soy Nuevo" />
+            <AdminNavLink href="#oracion" label="Oración" />
+            <AdminNavLink href="#servir" label="Servir" />
+            <AdminNavLink href="#ministerios" label="Ministerios" />
+            <AdminNavLink href="#anuncios" label="Anuncios" />
+            <AdminNavLink href="#eventos" label="Eventos" />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-8 sm:px-6">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <DashboardStat
-            label="New Visitors"
+            label="Visitantes nuevos"
             value={visitors.length}
-            subtext={`${pendingVisitors.length} pending`}
+            subtext={`${pendingVisitors.length} pendientes`}
           />
 
           <DashboardStat
-            label="Prayer Requests"
+            label="Peticiones de oración"
             value={prayers.length}
-            subtext={`${pendingPrayers.length} pending`}
+            subtext={`${pendingPrayers.length} pendientes`}
           />
 
           <DashboardStat
-            label="Volunteers"
+            label="Voluntarios"
             value={volunteers.length}
-            subtext={`${pendingVolunteers.length} pending`}
+            subtext={`${pendingVolunteers.length} pendientes`}
+          />
+
+          <DashboardStat
+            label="Intereses ministeriales"
+            value={ministryInterests.length}
+            subtext={`${pendingMinistryInterests.length} pendientes`}
           />
         </div>
       </section>
 
-      <section className="px-6 pb-20">
-        <div className="mx-auto grid max-w-7xl gap-8">
-          <DashboardPanel
-            id="visitors"
+      <section className="px-4 pb-20 sm:px-6">
+        <div className="mx-auto grid max-w-7xl gap-4">
+          <AccordionPanel
+            id="soy-nuevo"
             eyebrow="Soy Nuevo"
-            title="New Visitor Forms"
-            description="People who filled out the Soy Nuevo form on the public church page."
+            title="Formularios de visitantes"
+            count={visitors.length}
+            pendingCount={pendingVisitors.length}
+            description="Personas que llenaron el formulario Soy Nuevo en la página pública."
           >
             {visitors.length ? (
               <div className="grid gap-4">
                 {visitors.map((submission) => (
                   <SubmissionCard
                     key={submission.id}
-                    type="visitor"
                     item={submission}
                     updateAction={updateVisitorStatus}
-                    messageLabel="Message"
+                    deleteAction={deleteVisitorSubmission}
+                    messageLabel="Mensaje"
                     messageValue={submission.message}
                   />
                 ))}
               </div>
             ) : (
-              <EmptyState text="No visitor forms yet." />
+              <EmptyState text="Todavía no hay formularios de visitantes." />
             )}
-          </DashboardPanel>
+          </AccordionPanel>
 
-          <DashboardPanel
-            id="prayer"
+          <AccordionPanel
+            id="oracion"
             eyebrow="Pedir Oración"
-            title="Prayer Requests"
-            description="Private prayer requests submitted from the church page."
+            title="Peticiones de oración"
+            count={prayers.length}
+            pendingCount={pendingPrayers.length}
+            description="Peticiones privadas enviadas desde la página pública."
           >
             {prayers.length ? (
               <div className="grid gap-4">
                 {prayers.map((request) => (
                   <SubmissionCard
                     key={request.id}
-                    type="prayer"
                     item={request}
                     updateAction={updatePrayerStatus}
-                    messageLabel="Prayer Request"
+                    deleteAction={deletePrayerRequest}
+                    messageLabel="Petición de oración"
                     messageValue={request.prayer_request}
                   />
                 ))}
               </div>
             ) : (
-              <EmptyState text="No prayer requests yet." />
+              <EmptyState text="Todavía no hay peticiones de oración." />
             )}
-          </DashboardPanel>
+          </AccordionPanel>
 
-          <DashboardPanel
-            id="volunteers"
+          <AccordionPanel
+            id="servir"
             eyebrow="Servir"
-            title="Volunteer Signups"
-            description="People who want to help serve in the church."
+            title="Personas interesadas en servir"
+            count={volunteers.length}
+            pendingCount={pendingVolunteers.length}
+            description="Personas que desean apoyar en algún área de la iglesia."
           >
             {volunteers.length ? (
               <div className="grid gap-4">
                 {volunteers.map((volunteer) => (
                   <SubmissionCard
                     key={volunteer.id}
-                    type="volunteer"
                     item={volunteer}
                     updateAction={updateVolunteerStatus}
-                    messageLabel={`Area: ${volunteer.area ?? "Not selected"}`}
+                    deleteAction={deleteVolunteerSignup}
+                    sourceLabel="Área"
+                    sourceValue={volunteer.area ?? "No seleccionada"}
+                    messageLabel="Mensaje"
                     messageValue={volunteer.message}
                   />
                 ))}
               </div>
             ) : (
-              <EmptyState text="No volunteer signups yet." />
+              <EmptyState text="Todavía no hay voluntarios registrados." />
             )}
-          </DashboardPanel>
+          </AccordionPanel>
 
-          <DashboardPanel
-            id="announcements"
-            eyebrow="Public Page"
-            title="Announcements"
-            description="Create and update announcements. Published items appear on the public church page after we connect the homepage reader."
+          <AccordionPanel
+            id="ministerios"
+            eyebrow="Ministerios"
+            title="Intereses de ministerios"
+            count={ministryInterests.length}
+            pendingCount={pendingMinistryInterests.length}
+            description="Formularios enviados desde las páginas de ministerios. Pastor Socrates puede dar seguimiento desde aquí."
           >
-            <CreateAnnouncementForm />
+            {ministryInterests.length ? (
+              <div className="grid gap-4">
+                {ministryInterests.map((interest) => (
+                  <SubmissionCard
+                    key={interest.id}
+                    item={interest}
+                    updateAction={updateMinistryInterestStatus}
+                    deleteAction={deleteMinistryInterest}
+                    sourceLabel="Ministerio"
+                    sourceValue={interest.ministries?.name ?? "Ministerio general"}
+                    messageLabel="Mensaje de interés"
+                    messageValue={interest.message}
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyState text="Todavía no hay formularios de ministerios." />
+            )}
+          </AccordionPanel>
 
-            <div className="mt-6 grid gap-4">
+          <AccordionPanel
+            id="anuncios"
+            eyebrow="Página pública"
+            title="Anuncios"
+            count={announcements.length}
+            pendingCount={announcements.filter((item) => item.is_published).length}
+            pendingLabel="publicados"
+            description="Crea y actualiza anuncios. Los publicados pueden aparecer en la página pública."
+          >
+            <details className="mb-4 border border-[#D9E5F5] bg-[#F5F8FC]">
+              <summary className="cursor-pointer px-5 py-4 text-lg font-black">
+                + Crear nuevo anuncio
+              </summary>
+              <div className="border-t border-[#D9E5F5] p-5">
+                <CreateAnnouncementForm />
+              </div>
+            </details>
+
+            <div className="grid gap-3">
               {announcements.length ? (
                 announcements.map((announcement) => (
                   <AnnouncementEditor
@@ -289,32 +373,51 @@ export default async function TodosLosDiasAdminPage() {
                   />
                 ))
               ) : (
-                <EmptyState text="No announcements yet." />
+                <EmptyState text="Todavía no hay anuncios." />
               )}
             </div>
-          </DashboardPanel>
+          </AccordionPanel>
 
-          <DashboardPanel
-            id="events"
-            eyebrow="Church Calendar"
-            title="Events"
-            description="Create and update events for this church."
+          <AccordionPanel
+            id="eventos"
+            eyebrow="Calendario"
+            title="Eventos"
+            count={events.length}
+            pendingCount={events.filter((item) => item.is_published).length}
+            pendingLabel="publicados"
+            description="Crea y actualiza eventos para la iglesia."
           >
-            <CreateEventForm />
+            <details className="mb-4 border border-[#D9E5F5] bg-[#F5F8FC]">
+              <summary className="cursor-pointer px-5 py-4 text-lg font-black">
+                + Crear nuevo evento
+              </summary>
+              <div className="border-t border-[#D9E5F5] p-5">
+                <CreateEventForm />
+              </div>
+            </details>
 
-            <div className="mt-6 grid gap-4">
+            <div className="grid gap-3">
               {events.length ? (
-                events.map((event) => (
-                  <EventEditor key={event.id} event={event} />
-                ))
+                events.map((event) => <EventEditor key={event.id} event={event} />)
               ) : (
-                <EmptyState text="No events yet." />
+                <EmptyState text="Todavía no hay eventos." />
               )}
             </div>
-          </DashboardPanel>
+          </AccordionPanel>
         </div>
       </section>
     </main>
+  );
+}
+
+function AdminNavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#071A33] shadow-sm hover:bg-[#BBD7FF]"
+    >
+      {label}
+    </a>
   );
 }
 
@@ -328,53 +431,85 @@ function DashboardStat({
   subtext: string;
 }) {
   return (
-    <div className="bg-white p-6 shadow-sm">
-      <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
+    <div className="bg-white p-5 shadow-sm sm:p-6">
+      <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F] sm:text-sm">
         {label}
       </p>
-      <p className="mt-3 text-5xl font-black">{value}</p>
+      <p className="mt-3 text-4xl font-black sm:text-5xl">{value}</p>
       <p className="mt-2 text-sm font-bold text-[#52657D]">{subtext}</p>
     </div>
   );
 }
 
-function DashboardPanel({
+function AccordionPanel({
   id,
   eyebrow,
   title,
+  count,
+  pendingCount,
+  pendingLabel = "pendientes",
   description,
   children,
 }: {
   id: string;
   eyebrow: string;
   title: string;
+  count: number;
+  pendingCount: number;
+  pendingLabel?: string;
   description: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <section id={id} className="bg-white p-6 shadow-sm md:p-8">
-      <div className="mb-6">
-        <p className="text-sm font-black uppercase tracking-[0.3em] text-[#164B8F]">
-          {eyebrow}
-        </p>
-        <h2 className="mt-2 text-4xl font-black">{title}</h2>
-        <p className="mt-3 max-w-3xl text-lg font-medium leading-8 text-[#52657D]">
-          {description}
-        </p>
-      </div>
+    <details id={id} className="scroll-mt-6 bg-white shadow-sm">
+      <summary className="cursor-pointer list-none p-5 hover:bg-[#EEF5FF] sm:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#164B8F] sm:text-sm">
+              {eyebrow}
+            </p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-medium leading-7 text-[#52657D] sm:text-base">
+              {description}
+            </p>
+          </div>
 
-      {children}
-    </section>
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="bg-[#F5F8FC] px-4 py-3 text-center">
+              <p className="text-3xl font-black">{count}</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#52657D]">
+                total
+              </p>
+            </div>
+
+            <div className="bg-[#FFF4D7] px-4 py-3 text-center text-[#8A5A00]">
+              <p className="text-3xl font-black">{pendingCount}</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em]">
+                {pendingLabel}
+              </p>
+            </div>
+
+            <div className="hidden bg-[#071A33] px-4 py-3 text-sm font-black text-white sm:block">
+              Abrir
+            </div>
+          </div>
+        </div>
+      </summary>
+
+      <div className="border-t border-[#D9E5F5] p-5 sm:p-6">{children}</div>
+    </details>
   );
 }
 
 function SubmissionCard({
   item,
   updateAction,
+  deleteAction,
+  sourceLabel,
+  sourceValue,
   messageLabel,
   messageValue,
 }: {
-  type: "visitor" | "prayer" | "volunteer";
   item: {
     id: string;
     full_name: string;
@@ -385,11 +520,14 @@ function SubmissionCard({
     created_at: string;
   };
   updateAction: (formData: FormData) => Promise<void>;
+  deleteAction: (formData: FormData) => Promise<void>;
+  sourceLabel?: string;
+  sourceValue?: string | null;
   messageLabel: string;
   messageValue: string | null;
 }) {
   return (
-    <article className="border border-[#D9E5F5] bg-[#F5F8FC] p-5">
+    <article className="border border-[#D9E5F5] bg-[#F5F8FC] p-4 sm:p-5">
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div>
           <div className="flex flex-wrap items-center gap-3">
@@ -398,10 +536,15 @@ function SubmissionCard({
           </div>
 
           <div className="mt-3 grid gap-2 text-sm font-bold text-[#52657D] md:grid-cols-2">
-            <p>Phone: {item.phone || "—"}</p>
-            <p>Email: {item.email || "—"}</p>
+            <p>Teléfono: {item.phone || "—"}</p>
+            <p>Correo: {item.email || "—"}</p>
+            {sourceLabel ? (
+              <p className="md:col-span-2">
+                {sourceLabel}: {sourceValue || "—"}
+              </p>
+            ) : null}
             <p className="md:col-span-2">
-              Submitted: {new Date(item.created_at).toLocaleString()}
+              Enviado: {new Date(item.created_at).toLocaleString()}
             </p>
           </div>
 
@@ -410,44 +553,68 @@ function SubmissionCard({
               {messageLabel}
             </p>
             <p className="mt-2 whitespace-pre-wrap text-base font-medium leading-7 text-[#071A33]">
-              {messageValue || "No message provided."}
+              {messageValue || "Sin mensaje."}
             </p>
           </div>
         </div>
 
-        <form action={updateAction} className="bg-white p-4">
-          <input type="hidden" name="id" value={item.id} />
+        <div className="grid gap-3">
+          <form action={updateAction} className="bg-white p-4">
+            <input type="hidden" name="id" value={item.id} />
 
-          <label className="text-xs font-black uppercase tracking-[0.22em] text-[#52657D]">
-            Status
-          </label>
-          <select
-            name="status"
-            defaultValue={item.status}
-            className="mt-2 w-full border-2 border-[#D9E5F5] bg-white px-3 py-3 font-bold outline-none focus:border-[#164B8F]"
-          >
-            {validStatuses.map((status) => (
-              <option key={status}>{status}</option>
-            ))}
-          </select>
+            <label className="text-xs font-black uppercase tracking-[0.22em] text-[#52657D]">
+              Estado
+            </label>
+            <select
+              name="status"
+              defaultValue={item.status}
+              className="mt-2 w-full border-2 border-[#D9E5F5] bg-white px-3 py-3 font-bold outline-none focus:border-[#164B8F]"
+            >
+              {validStatuses.map((status) => (
+                <option key={status}>{status}</option>
+              ))}
+            </select>
 
-          <label className="mt-4 block text-xs font-black uppercase tracking-[0.22em] text-[#52657D]">
-            Pastor Notes
-          </label>
-          <textarea
-            name="notes"
-            defaultValue={item.notes ?? ""}
-            placeholder="Add private follow-up notes..."
-            className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-3 py-3 font-medium outline-none focus:border-[#164B8F]"
-          />
+            <label className="mt-4 block text-xs font-black uppercase tracking-[0.22em] text-[#52657D]">
+              Notas pastorales
+            </label>
+            <textarea
+              name="notes"
+              defaultValue={item.notes ?? ""}
+              placeholder="Agregar notas privadas de seguimiento..."
+              className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-3 py-3 font-medium outline-none focus:border-[#164B8F]"
+            />
 
-          <button
-            type="submit"
-            className="mt-4 w-full bg-[#071A33] px-4 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
-          >
-            Save
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="mt-4 w-full bg-[#071A33] px-4 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
+            >
+              Guardar
+            </button>
+          </form>
+
+          <details className="bg-white">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-black text-[#B1182D] hover:bg-[#FFF1F3]">
+              Eliminar este registro
+            </summary>
+
+            <form action={deleteAction} className="border-t border-[#FFE0E6] p-4">
+              <input type="hidden" name="id" value={item.id} />
+
+              <p className="text-sm font-bold leading-6 text-[#52657D]">
+                Esta acción elimina el registro del dashboard. Úsalo solo si ya
+                no necesitas esta solicitud.
+              </p>
+
+              <button
+                type="submit"
+                className="mt-3 w-full bg-[#B1182D] px-4 py-3 text-sm font-black text-white hover:bg-[#8F1324]"
+              >
+                Sí, eliminar
+              </button>
+            </form>
+          </details>
+        </div>
       </div>
     </article>
   );
@@ -459,7 +626,11 @@ function StatusBadge({ status }: { status: string }) {
       ? "bg-[#FFF4D7] text-[#8A5A00]"
       : status === "Contactado"
         ? "bg-[#E5F0FF] text-[#164B8F]"
-        : "bg-[#E6F7ED] text-[#16834A]";
+        : status === "Cerrado"
+          ? "bg-[#E6F7ED] text-[#16834A]"
+          : status === "Publicado"
+            ? "bg-[#E6F7ED] text-[#16834A]"
+            : "bg-[#F3F4F6] text-[#52657D]";
 
   return (
     <span className={`px-3 py-1 text-xs font-black uppercase ${className}`}>
@@ -470,21 +641,23 @@ function StatusBadge({ status }: { status: string }) {
 
 function CreateAnnouncementForm() {
   return (
-    <form action={createAnnouncement} className="grid gap-4 bg-[#F5F8FC] p-5">
-      <h3 className="text-2xl font-black">Create Announcement</h3>
+    <form action={createAnnouncement} className="grid gap-4">
+      <h3 className="text-2xl font-black">Crear anuncio</h3>
 
-      <AdminInput name="title" label="Title" required />
-      <AdminInput name="category" label="Category" />
-      <AdminTextarea name="description" label="Description" />
-      <AdminInput name="date_text" label="Date Text" />
-      <AdminInput name="time_text" label="Time Text" />
-      <AdminInput name="location" label="Location" />
+      <AdminInput name="title" label="Título" required />
+      <AdminInput name="category" label="Categoría" />
+      <AdminTextarea name="description" label="Descripción" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <AdminInput name="date_text" label="Fecha" />
+        <AdminInput name="time_text" label="Hora" />
+      </div>
+      <AdminInput name="location" label="Lugar" />
       <AdminInput
         name="flyer_url"
-        label="Flyer URL"
+        label="URL del volante"
         placeholder="/todos-los-dias/example.png"
       />
-      <AdminInput name="sort_order" label="Sort Order" defaultValue="0" />
+      <AdminInput name="sort_order" label="Orden" defaultValue="0" />
 
       <label className="flex items-center gap-3 text-sm font-black">
         <input
@@ -493,14 +666,14 @@ function CreateAnnouncementForm() {
           defaultChecked
           className="h-5 w-5"
         />
-        Published
+        Publicado
       </label>
 
       <button
         type="submit"
         className="bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
       >
-        Create Announcement
+        Crear anuncio
       </button>
     </form>
   );
@@ -508,61 +681,63 @@ function CreateAnnouncementForm() {
 
 function AnnouncementEditor({ announcement }: { announcement: any }) {
   return (
-    <article className="border border-[#D9E5F5] bg-[#F5F8FC] p-5">
-      <form action={updateAnnouncement} className="grid gap-4">
-        <input type="hidden" name="id" value={announcement.id} />
-
+    <details className="border border-[#D9E5F5] bg-[#F5F8FC]">
+      <summary className="cursor-pointer list-none p-5 hover:bg-[#EEF5FF]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h3 className="text-2xl font-black">
-            {announcement.title || "Untitled Announcement"}
+            {announcement.title || "Anuncio sin título"}
           </h3>
           <StatusBadge
-            status={announcement.is_published ? "Published" : "Draft"}
+            status={announcement.is_published ? "Publicado" : "Borrador"}
           />
         </div>
+      </summary>
+
+      <form action={updateAnnouncement} className="grid gap-4 border-t border-[#D9E5F5] p-5">
+        <input type="hidden" name="id" value={announcement.id} />
 
         <div className="grid gap-4 md:grid-cols-2">
           <AdminInput
             name="title"
-            label="Title"
+            label="Título"
             defaultValue={announcement.title}
             required
           />
           <AdminInput
             name="category"
-            label="Category"
+            label="Categoría"
             defaultValue={announcement.category}
           />
           <AdminInput
             name="date_text"
-            label="Date Text"
+            label="Fecha"
             defaultValue={announcement.date_text}
           />
           <AdminInput
             name="time_text"
-            label="Time Text"
+            label="Hora"
             defaultValue={announcement.time_text}
           />
           <AdminInput
             name="location"
-            label="Location"
+            label="Lugar"
             defaultValue={announcement.location}
           />
           <AdminInput
             name="flyer_url"
-            label="Flyer URL"
+            label="URL del volante"
             defaultValue={announcement.flyer_url}
           />
           <AdminInput
             name="sort_order"
-            label="Sort Order"
+            label="Orden"
             defaultValue={String(announcement.sort_order ?? 0)}
           />
         </div>
 
         <AdminTextarea
           name="description"
-          label="Description"
+          label="Descripción"
           defaultValue={announcement.description}
         />
 
@@ -573,38 +748,38 @@ function AnnouncementEditor({ announcement }: { announcement: any }) {
             defaultChecked={announcement.is_published}
             className="h-5 w-5"
           />
-          Published
+          Publicado
         </label>
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            className="bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
-          >
-            Save Announcement
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
+        >
+          Guardar anuncio
+        </button>
       </form>
-    </article>
+    </details>
   );
 }
 
 function CreateEventForm() {
   return (
-    <form action={createEvent} className="grid gap-4 bg-[#F5F8FC] p-5">
-      <h3 className="text-2xl font-black">Create Event</h3>
+    <form action={createEvent} className="grid gap-4">
+      <h3 className="text-2xl font-black">Crear evento</h3>
 
-      <AdminInput name="title" label="Title" required />
-      <AdminTextarea name="description" label="Description" />
-      <AdminInput name="date_text" label="Date Text" />
-      <AdminInput name="time_text" label="Time Text" />
-      <AdminInput name="location" label="Location" />
+      <AdminInput name="title" label="Título" required />
+      <AdminTextarea name="description" label="Descripción" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <AdminInput name="date_text" label="Fecha" />
+        <AdminInput name="time_text" label="Hora" />
+      </div>
+      <AdminInput name="location" label="Lugar" />
       <AdminInput
         name="flyer_url"
-        label="Flyer URL"
+        label="URL del volante"
         placeholder="/todos-los-dias/example.png"
       />
-      <AdminInput name="sort_order" label="Sort Order" defaultValue="0" />
+      <AdminInput name="sort_order" label="Orden" defaultValue="0" />
 
       <label className="flex items-center gap-3 text-sm font-black">
         <input
@@ -613,14 +788,14 @@ function CreateEventForm() {
           defaultChecked
           className="h-5 w-5"
         />
-        Published
+        Publicado
       </label>
 
       <button
         type="submit"
         className="bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
       >
-        Create Event
+        Crear evento
       </button>
     </form>
   );
@@ -628,54 +803,56 @@ function CreateEventForm() {
 
 function EventEditor({ event }: { event: any }) {
   return (
-    <article className="border border-[#D9E5F5] bg-[#F5F8FC] p-5">
-      <form action={updateEvent} className="grid gap-4">
-        <input type="hidden" name="id" value={event.id} />
-
+    <details className="border border-[#D9E5F5] bg-[#F5F8FC]">
+      <summary className="cursor-pointer list-none p-5 hover:bg-[#EEF5FF]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h3 className="text-2xl font-black">
-            {event.title || "Untitled Event"}
+            {event.title || "Evento sin título"}
           </h3>
-          <StatusBadge status={event.is_published ? "Published" : "Draft"} />
+          <StatusBadge status={event.is_published ? "Publicado" : "Borrador"} />
         </div>
+      </summary>
+
+      <form action={updateEvent} className="grid gap-4 border-t border-[#D9E5F5] p-5">
+        <input type="hidden" name="id" value={event.id} />
 
         <div className="grid gap-4 md:grid-cols-2">
           <AdminInput
             name="title"
-            label="Title"
+            label="Título"
             defaultValue={event.title}
             required
           />
           <AdminInput
             name="date_text"
-            label="Date Text"
+            label="Fecha"
             defaultValue={event.date_text}
           />
           <AdminInput
             name="time_text"
-            label="Time Text"
+            label="Hora"
             defaultValue={event.time_text}
           />
           <AdminInput
             name="location"
-            label="Location"
+            label="Lugar"
             defaultValue={event.location}
           />
           <AdminInput
             name="flyer_url"
-            label="Flyer URL"
+            label="URL del volante"
             defaultValue={event.flyer_url}
           />
           <AdminInput
             name="sort_order"
-            label="Sort Order"
+            label="Orden"
             defaultValue={String(event.sort_order ?? 0)}
           />
         </div>
 
         <AdminTextarea
           name="description"
-          label="Description"
+          label="Descripción"
           defaultValue={event.description}
         />
 
@@ -686,17 +863,17 @@ function EventEditor({ event }: { event: any }) {
             defaultChecked={event.is_published}
             className="h-5 w-5"
           />
-          Published
+          Publicado
         </label>
 
         <button
           type="submit"
           className="bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
         >
-          Save Event
+          Guardar evento
         </button>
       </form>
-    </article>
+    </details>
   );
 }
 
@@ -777,6 +954,20 @@ async function updateVisitorStatus(formData: FormData) {
   revalidatePath(ADMIN_PATH);
 }
 
+async function deleteVisitorSubmission(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("visitor_submissions")
+    .delete()
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+}
+
 async function updatePrayerStatus(formData: FormData) {
   "use server";
 
@@ -794,6 +985,20 @@ async function updatePrayerStatus(formData: FormData) {
   revalidatePath(ADMIN_PATH);
 }
 
+async function deletePrayerRequest(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("prayer_requests")
+    .delete()
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+}
+
 async function updateVolunteerStatus(formData: FormData) {
   "use server";
 
@@ -805,6 +1010,51 @@ async function updateVolunteerStatus(formData: FormData) {
       status: getStatus(formData),
       notes: getOptionalString(formData, "notes"),
     })
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+}
+
+async function deleteVolunteerSignup(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("volunteer_signups")
+    .delete()
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+}
+
+async function updateMinistryInterestStatus(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("ministry_interest_submissions")
+    .update({
+      status: getStatus(formData),
+      notes: getOptionalString(formData, "notes"),
+    })
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+}
+
+async function deleteMinistryInterest(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("ministry_interest_submissions")
+    .delete()
     .eq("id", getString(formData, "id"))
     .eq("church_id", church.id);
 
@@ -830,7 +1080,7 @@ async function createAnnouncement(formData: FormData) {
   });
 
   revalidatePath(ADMIN_PATH);
-  revalidatePath("/todos-los-dias");
+  revalidatePath(PUBLIC_PATH);
 }
 
 async function updateAnnouncement(formData: FormData) {
@@ -855,7 +1105,7 @@ async function updateAnnouncement(formData: FormData) {
     .eq("church_id", church.id);
 
   revalidatePath(ADMIN_PATH);
-  revalidatePath("/todos-los-dias");
+  revalidatePath(PUBLIC_PATH);
 }
 
 async function createEvent(formData: FormData) {
@@ -876,7 +1126,7 @@ async function createEvent(formData: FormData) {
   });
 
   revalidatePath(ADMIN_PATH);
-  revalidatePath("/todos-los-dias");
+  revalidatePath(PUBLIC_PATH);
 }
 
 async function updateEvent(formData: FormData) {
@@ -900,7 +1150,7 @@ async function updateEvent(formData: FormData) {
     .eq("church_id", church.id);
 
   revalidatePath(ADMIN_PATH);
-  revalidatePath("/todos-los-dias");
+  revalidatePath(PUBLIC_PATH);
 }
 
 async function signOut() {
