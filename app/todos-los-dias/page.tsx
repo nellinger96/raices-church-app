@@ -77,15 +77,15 @@ const upcomingAnnouncements = [
     accent: "red",
   },
   {
-    title: "Día en el Parque",
-    category: "Familia / Comunidad",
-    date: "Sábado, 1 de agosto",
-    time: "Todo el día",
-    location: "Irvine Regional Park · 1 Irvine Park Rd, Orange, CA 92869",
+    title: "Reunión de Hermanas",
+    category: "Mujeres",
+    date: "Viernes 19 de junio",
+    time: "5:30 PM",
+    location: "Iglesia de Todos los Días",
     description:
-      "Comida, juegos, diversión, devocional, alabanza y compañerismo para toda la familia.",
-    flyer: "/todos-los-dias/dia-parque.png",
-    accent: "green",
+      "Una noche para conectar, crear y disfrutar entre hermanas con aperitivos, juegos y manualidades.",
+    flyer: "/todos-los-dias/hermanas.png",
+    accent: "pink",
   },
   {
     title: "VBS: Illumination Station",
@@ -99,15 +99,15 @@ const upcomingAnnouncements = [
     accent: "purple",
   },
   {
-    title: "Reunión de Hermanas",
-    category: "Mujeres",
-    date: "Viernes 19 de junio",
-    time: "5:30 PM",
-    location: "Iglesia de Todos los Días",
+    title: "Día en el Parque",
+    category: "Familia / Comunidad",
+    date: "Sábado, 1 de agosto",
+    time: "Todo el día",
+    location: "Irvine Regional Park · 1 Irvine Park Rd, Orange, CA 92869",
     description:
-      "Una noche para conectar, crear y disfrutar entre hermanas con aperitivos, juegos y manualidades.",
-    flyer: "/todos-los-dias/hermanas.png",
-    accent: "pink",
+      "Comida, juegos, diversión, devocional, alabanza y compañerismo para toda la familia.",
+    flyer: "/todos-los-dias/dia-parque.png",
+    accent: "green",
   },
 ];
 
@@ -243,8 +243,8 @@ export default function TodosLosDiasPage() {
                 </div>
               </div>
 
-              <a href="#pastor" className="hover:text-[#BBD7FF]">
-                Pastor
+              <a href="/todos-los-dias/liderazgo" className="hover:text-[#BBD7FF]">
+                Liderazgo
               </a>
               <a href="#conectar" className="hover:text-[#BBD7FF]">
                 Conectar
@@ -337,11 +337,11 @@ export default function TodosLosDiasPage() {
 
                 <div className="mt-4 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-white/60 p-2 shadow-sm backdrop-blur-sm">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center">
                       <img
                         src={todosLosDiasChurch.mainPlaceLogo}
                         alt={todosLosDiasChurch.partnershipName}
-                        className="max-h-full max-w-full object-contain"
+                        className="h-10 w-10 object-contain"
                       />
                     </div>
 
@@ -356,11 +356,11 @@ export default function TodosLosDiasPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-white/60 p-2 shadow-sm backdrop-blur-sm">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center">
                       <img
                         src={todosLosDiasChurch.logo}
                         alt={todosLosDiasChurch.name}
-                        className="max-h-full max-w-full object-contain"
+                        className="h-10 w-10 object-contain"
                       />
                     </div>
 
@@ -547,109 +547,6 @@ export default function TodosLosDiasPage() {
                 Una iglesia para toda la familia
               </h3>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PASTOR BIO */}
-      <section id="pastor" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="relative min-h-[380px] overflow-hidden bg-[#071A33] shadow-xl sm:min-h-[460px] sm:translate-y-8">
-              <img
-                src={churchPhotos.pastorWife}
-                alt="Pastor Socrates y su esposa"
-                className="h-full min-h-[380px] w-full object-cover sm:min-h-[460px]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/65 to-transparent" />
-            </div>
-
-            <div className="space-y-4">
-              <div className="relative min-h-[260px] overflow-hidden bg-[#071A33] shadow-xl sm:min-h-[270px]">
-                <img
-                  src={churchPhotos.pastorFamily}
-                  alt="Familia del Pastor Socrates"
-                  className="h-full min-h-[260px] w-full object-cover sm:min-h-[270px]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/60 to-transparent" />
-              </div>
-
-              <div className="bg-[#071A33] p-7 text-white shadow-xl">
-                <p className="text-xs font-black uppercase tracking-[0.3em] text-[#BBD7FF] sm:text-sm">
-                  Liderazgo
-                </p>
-                <h3 className="mt-3 text-2xl font-black sm:text-3xl">
-                  Sirviendo a Dios y a la comunidad.
-                </h3>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
-              Conoce al Pastor
-            </p>
-
-            <h2 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
-              Pastor Socrates Lopez
-            </h2>
-
-            <p className="mt-6 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
-              Pastor Socrates sirve a la comunidad con un corazón pastoral,
-              familiar y cercano. Su deseo es que cada persona que llegue a
-              Iglesia de Todos los Días pueda sentirse bienvenida, amada y
-              acompañada en su caminar con Dios.
-            </p>
-
-            <p className="mt-5 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
-              Junto a su familia, busca levantar una iglesia centrada en la
-              Palabra de Dios, la oración, la comunidad y el servicio a las
-              familias hispanas.
-            </p>
-
-            <div className="mt-9 grid gap-4 sm:grid-cols-3">
-              <div className="border-t-4 border-[#164B8F] bg-[#F5F8FC] p-5">
-                <p className="text-3xl font-black">Fe</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Guiados por la Palabra de Dios
-                </p>
-              </div>
-
-              <div className="border-t-4 border-[#B1182D] bg-[#F5F8FC] p-5">
-                <p className="text-3xl font-black">Familia</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Una iglesia para todas las generaciones
-                </p>
-              </div>
-
-              <div className="border-t-4 border-[#164B8F] bg-[#F5F8FC] p-5">
-                <p className="text-3xl font-black">Servicio</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Amando y sirviendo a la comunidad
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PHOTOS */}
-      <section className="px-4 py-16 sm:px-6 sm:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-8">
-            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
-              Comunidad
-            </p>
-            <h2 className="mt-2 text-4xl font-black sm:text-5xl md:text-6xl">
-              Vida de la iglesia
-            </h2>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <PhotoBlock title="Adoración" image={churchPhotos.hero} />
-            <PhotoBlock title="Familia" image={churchPhotos.family} />
-            <PhotoBlock title="Liderazgo" image={churchPhotos.leadership} />
-            <PhotoBlock title="Mujeres" image={churchPhotos.women} />
           </div>
         </div>
       </section>
@@ -846,37 +743,9 @@ export default function TodosLosDiasPage() {
         </div>
       </section>
 
-      {/* QR */}
-      <section className="px-4 py-16 sm:px-6 sm:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div className="flex h-72 items-center justify-center bg-[#071A33] text-white sm:h-80">
-            <div className="text-center">
-              <p className="text-7xl font-black">QR</p>
-              <p className="mt-2 text-lg font-bold text-white/70">
-                Escanea aquí
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
-              Acceso rápido
-            </p>
-            <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
-              Guarda la iglesia en tu teléfono.
-            </h2>
-            <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
-              Los visitantes podrán escanear un QR para abrir esta página y
-              tener acceso rápido a anuncios, eventos, oración, voluntariado y
-              donaciones.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* FOOTER */}
       <footer className="bg-[#071A33] px-4 py-10 pb-20 text-white sm:px-6 md:pb-10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1fr_auto] md:items-center">
           <div className="flex items-center gap-4">
             <img
               src={todosLosDiasChurch.logo}
@@ -891,7 +760,28 @@ export default function TodosLosDiasPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <nav className="flex flex-wrap gap-3 text-sm font-black">
+            <a href="/todos-los-dias" className="bg-white/10 px-4 py-2 hover:bg-white/20">
+              Inicio
+            </a>
+            <a
+              href="/todos-los-dias/liderazgo"
+              className="bg-white px-4 py-2 text-[#071A33] hover:bg-[#BBD7FF]"
+            >
+              Liderazgo
+            </a>
+            <a
+              href="/todos-los-dias/ministerios/evangelismo"
+              className="bg-white/10 px-4 py-2 hover:bg-white/20"
+            >
+              Ministerios
+            </a>
+            <a href="#donar" className="bg-white/10 px-4 py-2 hover:bg-white/20">
+              Donar
+            </a>
+          </nav>
+
+          <div className="flex items-center gap-4 md:col-span-2">
             <p className="text-sm text-white/60">En colaboración con</p>
             <img
               src={todosLosDiasChurch.mainPlaceLogo}
