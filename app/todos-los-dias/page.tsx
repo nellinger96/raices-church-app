@@ -48,6 +48,30 @@ const heroSlides = [
   },
 ];
 
+
+const youtubeShorts = [
+  {
+    id: "u5AlOcQkwhM",
+    title: "Mensaje corto del Pastor",
+  },
+  {
+    id: "eybbrECZRAc",
+    title: "Palabra para tu semana",
+  },
+  {
+    id: "YfwhJH_GklA",
+    title: "Reflexión de fe",
+  },
+  {
+    id: "uCKZ7kUhpUU",
+    title: "Devocional corto",
+  },
+  {
+    id: "zOvqSijdNoc",
+    title: "Ánimo espiritual",
+  },
+];
+
 const ministryLinks = [
   { name: "Evangelismo", href: "/todos-los-dias/ministerios/evangelismo" },
   {
@@ -66,13 +90,13 @@ const ministryLinks = [
 
 const upcomingAnnouncements = [
   {
-    title: "Free Worship",
-    category: "Adoración / Prayer / Freedom",
-    date: "Every Wednesday",
+    title: "Adoración Libre",
+    category: "Adoración / Oración / Libertad",
+    date: "Cada miércoles",
     time: "6:30 PM",
     location: "Main Place Christian Fellowship",
     description:
-      "A night of worship, prayer, and freedom. Everyone is welcome to come as they are.",
+      "Una noche de adoración, oración y libertad. Todos son bienvenidos tal como son.",
     flyer: "/todos-los-dias/free-worship.png",
     accent: "red",
   },
@@ -88,10 +112,10 @@ const upcomingAnnouncements = [
     accent: "pink",
   },
   {
-    title: "VBS: Illumination Station",
-    category: "Niños / Kids Ministry",
-    date: "July 24–26",
-    time: "Fri/Sat 9:00 AM–1:30 PM · Sunday 9:00 AM–12:00 PM",
+    title: "Escuelita Bíblica de Verano: Illumination Station",
+    category: "Niños / Ministerio Infantil",
+    date: "24–26 de julio",
+    time: "Viernes/Sábado 9:00 AM–1:30 PM · Domingo 9:00 AM–12:00 PM",
     location: "Main Place Christian Fellowship",
     description:
       "Un evento para niños de 4 a 11 años con fe, juegos, música y aventuras bíblicas.",
@@ -225,6 +249,14 @@ export default function TodosLosDiasPage() {
                 Anuncios
               </a>
 
+              <a href="/todos-los-dias/hoy" className="hover:text-[#BBD7FF]">
+                Hoy con Dios
+              </a>
+
+              <a href="/todos-los-dias/historias" className="hover:text-[#BBD7FF]">
+                Historias de Fe
+              </a>
+
               <div className="group relative">
                 <button className="font-bold hover:text-[#BBD7FF]">
                   Ministerios ▾
@@ -283,6 +315,20 @@ export default function TodosLosDiasPage() {
                   className="rounded-full bg-white px-6 py-4 text-center text-sm font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF]"
                 >
                   Conectarme
+                </a>
+
+                <a
+                  href="/todos-los-dias/hoy"
+                  className="rounded-full border border-white/30 bg-white/10 px-6 py-4 text-center text-sm font-black text-white hover:bg-white/20"
+                >
+                  Hoy con Dios
+                </a>
+
+                <a
+                  href="/todos-los-dias/historias"
+                  className="rounded-full border border-white/30 bg-white/10 px-6 py-4 text-center text-sm font-black text-white hover:bg-white/20"
+                >
+                  Historias de Fe
                 </a>
 
                 <div className="relative md:hidden">
@@ -658,52 +704,41 @@ export default function TodosLosDiasPage() {
         </div>
       </section>
 
-      {/* VIDEOS */}
+      {/* SHORTS */}
       <section className="bg-[#F5F8FC] px-4 py-16 sm:px-6 sm:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.35em] text-[#164B8F] sm:text-sm">
-              Mensajes
+              Momentos de Fe
             </p>
-            <h2 className="mt-3 text-4xl font-black sm:text-5xl md:text-6xl">
-              Mira enseñanzas en YouTube.
+            <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
+              Mensajes cortos para tu semana.
             </h2>
             <p className="mt-5 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
-              Visita el canal de Pastor Socrates para ver mensajes y contenido
-              para fortalecer tu fe.
+              Mira reflexiones breves del Pastor Socrates en formato vertical.
+              Desliza hacia abajo para ver más mensajes.
             </p>
 
-            <a
-              href={todosLosDiasChurch.youtubeUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 inline-flex rounded-full bg-[#071A33] px-8 py-4 text-lg font-black text-white hover:bg-[#164B8F]"
-            >
-              Abrir YouTube
-            </a>
-          </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={todosLosDiasChurch.youtubeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-[#071A33] px-8 py-4 text-center text-lg font-black text-white hover:bg-[#164B8F]"
+              >
+                Ver canal de YouTube
+              </a>
 
-          <div className="relative min-h-[360px] overflow-hidden bg-[#071A33] p-8 text-white sm:min-h-[420px]">
-            <img
-              src={churchPhotos.pm}
-              alt="Pastor Socrates mensajes"
-              className="absolute inset-0 h-full w-full object-cover opacity-45"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#071A33]/90 to-[#071A33]/35" />
-
-            <div className="relative z-10">
-              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
-                Canal oficial
-              </p>
-              <h3 className="mt-4 text-4xl font-black sm:text-5xl">
-                Pastor Socrates
-              </h3>
-              <p className="mt-5 max-w-xl text-lg font-medium leading-8 text-white/80">
-                Cuando tengamos videos específicos, aquí se mostrarán como
-                mensajes destacados.
-              </p>
+              <a
+                href="/todos-los-dias/hoy"
+                className="rounded-full border-2 border-[#071A33] px-8 py-4 text-center text-lg font-black text-[#071A33] hover:bg-white"
+              >
+                Ir a Hoy con Dios
+              </a>
             </div>
           </div>
+
+          <ShortsLoop />
         </div>
       </section>
 
@@ -734,9 +769,21 @@ export default function TodosLosDiasPage() {
               Aquí irá el correo, teléfono o código QR oficial de la iglesia.
             </p>
 
-            <div className="mt-6 flex h-48 items-center justify-center border-4 border-dashed border-[#164B8F] text-center">
-              <p className="text-2xl font-black text-[#164B8F]">
-                QR / Zelle
+            <div className="mt-6 bg-[#F5F8FC] p-5 text-center">
+              <p className="mb-4 text-base font-black uppercase tracking-[0.18em] text-[#071A33]">
+                Cheques a nombre de: MINISTRY INC
+              </p>
+
+              <div className="mx-auto max-w-xs bg-white p-4 shadow-sm">
+                <img
+                  src="/todos-los-dias/qr.png"
+                  alt="Código QR para dar por Zelle"
+                  className="h-auto w-full object-contain"
+                />
+              </div>
+
+              <p className="mt-4 text-sm font-bold text-[#52657D]">
+                Escanea el código para dar por Zelle.
               </p>
             </div>
           </div>
@@ -771,6 +818,18 @@ export default function TodosLosDiasPage() {
               Liderazgo
             </a>
             <a
+              href="/todos-los-dias/hoy"
+              className="bg-white/10 px-4 py-2 hover:bg-white/20"
+            >
+              Hoy con Dios
+            </a>
+            <a
+              href="/todos-los-dias/historias"
+              className="bg-white/10 px-4 py-2 hover:bg-white/20"
+            >
+              Historias de Fe
+            </a>
+            <a
               href="/todos-los-dias/ministerios/evangelismo"
               className="bg-white/10 px-4 py-2 hover:bg-white/20"
             >
@@ -792,6 +851,69 @@ export default function TodosLosDiasPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+
+function ShortsLoop() {
+  const loopedShorts = [...youtubeShorts, ...youtubeShorts];
+
+  return (
+    <div className="relative">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
+          Shorts
+        </p>
+        <p className="text-sm font-bold text-[#52657D]">
+          Desliza para ver más
+        </p>
+      </div>
+
+      <div
+        className="max-h-[720px] snap-y snap-mandatory overflow-y-auto pr-2"
+        onScroll={(event) => {
+          const container = event.currentTarget;
+          const halfway = container.scrollHeight / 2;
+
+          if (container.scrollTop >= halfway) {
+            container.scrollTop = 0;
+          }
+        }}
+      >
+        <div className="grid gap-5">
+          {loopedShorts.map((short, index) => (
+            <article
+              key={`${short.id}-${index}`}
+              className="snap-start overflow-hidden bg-[#071A33] shadow-xl"
+            >
+              <div className="aspect-[9/16] w-full">
+                <iframe
+                  src={`https://www.youtube.com/embed/${short.id}?rel=0&modestbranding=1&playsinline=1`}
+                  title={short.title}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+
+              <div className="bg-white p-4">
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                  Pastor Socrates
+                </p>
+                <h3 className="mt-2 text-xl font-black text-[#071A33]">
+                  {short.title}
+                </h3>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-3 text-xs font-bold leading-6 text-[#52657D]">
+        Nota: YouTube puede requerir tocar reproducir en algunos teléfonos.
+        La lista vuelve al inicio automáticamente al llegar al final.
+      </p>
+    </div>
   );
 }
 
