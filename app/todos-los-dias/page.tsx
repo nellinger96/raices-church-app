@@ -244,11 +244,7 @@ export default function TodosLosDiasPage() {
               </div>
             </a>
 
-            <nav className="hidden items-center gap-7 text-sm font-bold md:flex">
-              <a href="#anuncios" className="hover:text-[#BBD7FF]">
-                Anuncios
-              </a>
-
+            <nav className="hidden items-center gap-6 text-sm font-bold lg:flex">
               <a href="/todos-los-dias/hoy" className="hover:text-[#BBD7FF]">
                 Hoy con Dios
               </a>
@@ -257,30 +253,26 @@ export default function TodosLosDiasPage() {
                 Historias de Fe
               </a>
 
-              <div className="group relative">
-                <button className="font-bold hover:text-[#BBD7FF]">
+              <details className="group relative">
+                <summary className="cursor-pointer list-none font-bold hover:text-[#BBD7FF]">
                   Ministerios ▾
-                </button>
+                </summary>
 
-                <div className="invisible absolute right-0 top-full z-50 mt-3 w-64 border border-white/15 bg-white p-2 text-[#071A33] opacity-0 shadow-2xl transition group-hover:visible group-hover:opacity-100">
-                  {ministryLinks.map((ministry) => (
-                    <a
-                      key={ministry.href}
-                      href={ministry.href}
-                      className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF] hover:text-[#164B8F]"
-                    >
-                      {ministry.name}
-                    </a>
-                  ))}
+                <div className="absolute right-0 top-full z-50 pt-3">
+                  <div className="w-72 border border-white/15 bg-white p-2 text-[#071A33] shadow-2xl">
+                    {ministryLinks.map((ministry) => (
+                      <a
+                        key={ministry.href}
+                        href={ministry.href}
+                        className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF] hover:text-[#164B8F]"
+                      >
+                        {ministry.name}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </details>
 
-              <a href="/todos-los-dias/liderazgo" className="hover:text-[#BBD7FF]">
-                Liderazgo
-              </a>
-              <a href="#conectar" className="hover:text-[#BBD7FF]">
-                Conectar
-              </a>
               <a href="#donar" className="hover:text-[#BBD7FF]">
                 Donar
               </a>
@@ -288,7 +280,7 @@ export default function TodosLosDiasPage() {
 
             <a
               href="#conectar"
-              className="rounded-full bg-white px-4 py-3 text-xs font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF] sm:px-5 sm:text-sm"
+              className="hidden rounded-full bg-white px-4 py-3 text-xs font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF] sm:inline-flex sm:px-5 sm:text-sm"
             >
               Soy Nuevo
             </a>
@@ -310,12 +302,23 @@ export default function TodosLosDiasPage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#conectar"
-                  className="rounded-full bg-white px-6 py-4 text-center text-sm font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF]"
-                >
-                  Conectarme
-                </a>
+                <details className="relative rounded-full bg-white text-[#071A33] shadow-lg">
+                  <summary className="cursor-pointer list-none px-6 py-4 text-center text-sm font-black hover:bg-[#BBD7FF]">
+                    Ministerios
+                  </summary>
+
+                  <div className="absolute left-0 z-50 mt-3 w-72 overflow-hidden bg-white p-2 text-left text-[#071A33] shadow-2xl sm:w-80">
+                    {ministryLinks.map((ministry) => (
+                      <a
+                        key={ministry.href}
+                        href={ministry.href}
+                        className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF] hover:text-[#164B8F]"
+                      >
+                        {ministry.name}
+                      </a>
+                    ))}
+                  </div>
+                </details>
 
                 <a
                   href="/todos-los-dias/hoy"
@@ -330,25 +333,6 @@ export default function TodosLosDiasPage() {
                 >
                   Historias de Fe
                 </a>
-
-                <div className="relative md:hidden">
-                  <details className="group rounded-full border border-white/30 bg-white/10">
-                    <summary className="cursor-pointer list-none px-6 py-4 text-center text-sm font-black text-white">
-                      Ministerios
-                    </summary>
-                    <div className="mt-2 overflow-hidden bg-white p-2 text-left text-[#071A33] shadow-xl">
-                      {ministryLinks.map((ministry) => (
-                        <a
-                          key={ministry.href}
-                          href={ministry.href}
-                          className="block px-4 py-3 text-sm font-black hover:bg-[#EEF5FF]"
-                        >
-                          {ministry.name}
-                        </a>
-                      ))}
-                    </div>
-                  </details>
-                </div>
               </div>
             </div>
           </div>

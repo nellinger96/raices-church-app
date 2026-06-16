@@ -202,6 +202,7 @@ export default async function TodosLosDiasAdminPage() {
             <AdminNavLink href="#oracion" label="Oración" />
             <AdminNavLink href="#servir" label="Servir" />
             <AdminNavLink href="#ministerios" label="Ministerios" />
+            <AdminNavLink href="/todos-los-dias/admin/historias" label="Historias" />
             <AdminNavLink href="#anuncios" label="Anuncios" />
             <AdminNavLink href="#eventos" label="Eventos" />
           </div>
