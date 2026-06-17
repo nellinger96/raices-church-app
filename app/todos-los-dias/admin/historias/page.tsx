@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Church = {
@@ -85,6 +85,14 @@ export default function AdminHistoriasPage() {
       stories.filter(
         (story) =>
           story.story_type === "testimony" && story.status === "approved",
+      ),
+    [stories],
+  );
+
+  const hiddenStories = useMemo(
+    () =>
+      stories.filter(
+        (story) => story.status === "rejected" || story.status === "expired",
       ),
     [stories],
   );
@@ -335,162 +343,229 @@ export default function AdminHistoriasPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F5F8FC] text-[#071A33]">
-      <header className="bg-[#071A33] px-4 py-8 text-white sm:px-6">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
-              Panel Pastoral Raíces
-            </p>
-            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-5xl">
-              Historias
-            </h1>
-            <p className="mt-3 text-sm font-bold text-white/65">
-              {church?.display_name ?? church?.name ?? "Iglesia de Todos los Días"}
-            </p>
+    <main className="min-h-screen bg-[#EEF3F9] text-[#071A33]">
+      <section className="relative overflow-hidden bg-[#071A33] px-4 py-8 text-white sm:px-6">
+        <div className="absolute inset-0 opacity-20">
+          <div className="h-full w-full bg-[radial-gradient(circle_at_18%_20%,rgba(187,215,255,0.65),transparent_26%),radial-gradient(circle_at_90%_15%,rgba(177,24,45,0.35),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:auto,auto,70px_70px,70px_70px]" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#BBD7FF] sm:text-sm">
+                Panel Pastoral Raíces
+              </p>
+              <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
+                Historias
+              </h1>
+              <p className="mt-4 text-sm font-bold text-white/65">
+                {church?.display_name ?? church?.name ?? "Iglesia de Todos los Días"} · Hoy con Dios y testimonios
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <a
+                href="/todos-los-dias/admin"
+                className="rounded-full bg-white px-6 py-3 text-center text-sm font-black text-[#071A33] shadow-lg hover:bg-[#BBD7FF]"
+              >
+                Volver al dashboard
+              </a>
+
+              <a
+                href="/todos-los-dias/historias"
+                className="rounded-full border border-white/25 px-6 py-3 text-center text-sm font-black text-white hover:bg-white/10"
+              >
+                Ver público
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <a
-              href="/todos-los-dias/admin"
-              className="bg-white px-5 py-3 text-sm font-black text-[#071A33] hover:bg-[#BBD7FF]"
-            >
-              Volver al dashboard
-            </a>
-            <a
-              href="/todos-los-dias/historias"
-              className="border border-white/30 px-5 py-3 text-sm font-black text-white hover:bg-white/10"
-            >
-              Ver historias públicas
-            </a>
+          <div className="mt-8 grid gap-4 md:grid-cols-4">
+            <HeroMetric
+              label="Hoy con Dios"
+              value={pastorStories.length}
+              subtext="Historias pastorales"
+            />
+            <HeroMetric
+              label="Pendientes"
+              value={pendingTestimonies.length}
+              subtext="Testimonios por revisar"
+              urgent={pendingTestimonies.length > 0}
+            />
+            <HeroMetric
+              label="Aprobados"
+              value={approvedTestimonies.length}
+              subtext="Visibles al público"
+            />
+            <HeroMetric
+              label="Ocultos"
+              value={hiddenStories.length}
+              subtext="Rechazados o expirados"
+            />
           </div>
         </div>
-      </header>
+      </section>
 
-      <section className="px-4 py-8 sm:px-6">
-        <div className="mx-auto grid max-w-7xl gap-5 sm:grid-cols-3">
-          <StatCard label="Historias pastorales" value={pastorStories.length} />
-          <StatCard label="Testimonios pendientes" value={pendingTestimonies.length} />
-          <StatCard label="Testimonios aprobados" value={approvedTestimonies.length} />
+      <section className="px-4 py-6 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            <PillLink href="#crear" label="Crear Hoy con Dios" />
+            <PillLink href="#pendientes" label="Pendientes" />
+            <PillLink href="#aprobadas" label="Aprobadas" />
+            <PillLink href="#pastorales" label="Pastorales" />
+            <PillLink href="/todos-los-dias/hoy" label="Ver Hoy con Dios" />
+            <PillLink href="/todos-los-dias/historias" label="Ver Historias" />
+          </div>
         </div>
       </section>
 
       <section className="px-4 pb-20 sm:px-6">
         <div className="mx-auto grid max-w-7xl gap-6">
           {statusMessage ? (
-            <div className="bg-white p-4 text-sm font-black text-[#164B8F] shadow-sm">
+            <div className="rounded-3xl bg-white p-4 text-sm font-black text-[#164B8F] shadow-sm">
               {statusMessage}
             </div>
           ) : null}
 
           {isLoading ? (
-            <div className="bg-white p-8 text-center shadow-sm">
-              <p className="text-lg font-black">Cargando...</p>
+            <div className="rounded-[2rem] bg-white p-8 text-center shadow-sm">
+              <p className="text-lg font-black">Cargando historias...</p>
             </div>
           ) : (
             <>
-              <Panel
-                eyebrow="Hoy con Dios"
-                title="Crear historia pastoral"
-                description="Publica un video corto, versículo, devocional y enfoque de oración para la iglesia."
-              >
-                <form onSubmit={createPastorStory} className="grid gap-5">
-                  <Input name="title" label="Título" required />
-                  <Input name="verse_reference" label="Referencia bíblica" placeholder="Ej. Juan 15:5" />
+              <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+                <aside className="grid gap-4">
+                  <FeatureCard
+                    title="Hoy con Dios"
+                    description="Publica versículos, devocionales y enfoques de oración en formato historia."
+                    href="#crear"
+                    label="Crear historia"
+                  />
+                  <FeatureCard
+                    title="Testimonios"
+                    description="Revisa videos enviados por miembros antes de hacerlos públicos."
+                    href="#pendientes"
+                    label="Revisar pendientes"
+                    dark
+                  />
+                </aside>
 
-                  <label className="block">
-                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                      Texto bíblico
-                    </span>
-                    <textarea
-                      name="verse_text"
-                      className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
-                    />
-                  </label>
+                <Panel
+                  id="crear"
+                  eyebrow="Hoy con Dios"
+                  title="Crear historia pastoral"
+                  description="Publica un video corto, versículo, devocional y enfoque de oración para la iglesia."
+                >
+                  <form onSubmit={createPastorStory} className="grid gap-5">
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <Input name="title" label="Título" required />
+                      <Input
+                        name="verse_reference"
+                        label="Referencia bíblica"
+                        placeholder="Ej. Juan 15:5"
+                      />
+                    </div>
 
-                  <label className="block">
-                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                      Devocional corto
-                    </span>
-                    <textarea
-                      name="devotional_text"
-                      className="mt-2 min-h-28 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                      Enfoque de oración
-                    </span>
-                    <textarea
-                      name="prayer_focus"
-                      className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                      Caption / descripción breve
-                    </span>
-                    <textarea
-                      name="caption"
-                      className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                      Video o imagen
-                    </span>
-                    <input
-                      name="media"
-                      type="file"
-                      accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp"
-                      className="mt-2 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
-                    />
-                    <p className="mt-2 text-xs font-bold text-[#52657D]">
-                      Máximo {MAX_FILE_SIZE_MB} MB.
-                    </p>
-                  </label>
-
-                  <div className="grid gap-5 md:grid-cols-2">
                     <label className="block">
                       <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
-                        Expira en
+                        Texto bíblico
                       </span>
-                      <select
-                        name="expiration"
-                        defaultValue="24h"
-                        className="mt-2 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
-                      >
-                        <option value="24h">24 horas</option>
-                        <option value="3d">3 días</option>
-                        <option value="7d">7 días</option>
-                        <option value="30d">30 días</option>
-                        <option value="none">No expira</option>
-                      </select>
+                      <textarea
+                        name="verse_text"
+                        className="mt-2 min-h-24 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+                      />
                     </label>
 
-                    <label className="flex items-center gap-3 pt-8 text-sm font-black">
-                      <input name="is_featured" type="checkbox" className="h-5 w-5" />
-                      Destacar historia
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Devocional corto
+                      </span>
+                      <textarea
+                        name="devotional_text"
+                        className="mt-2 min-h-28 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+                      />
                     </label>
-                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-[#071A33] px-6 py-4 text-lg font-black text-white hover:bg-[#164B8F] disabled:opacity-60"
-                  >
-                    {isSubmitting ? "Publicando..." : "Publicar historia"}
-                  </button>
-                </form>
-              </Panel>
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Enfoque de oración
+                      </span>
+                      <textarea
+                        name="prayer_focus"
+                        className="mt-2 min-h-24 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Caption / descripción breve
+                      </span>
+                      <textarea
+                        name="caption"
+                        className="mt-2 min-h-24 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Video o imagen
+                      </span>
+                      <input
+                        name="media"
+                        type="file"
+                        accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp"
+                        className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
+                      />
+                      <p className="mt-2 text-xs font-bold text-[#52657D]">
+                        Máximo {MAX_FILE_SIZE_MB} MB.
+                      </p>
+                    </label>
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <label className="block">
+                        <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                          Expira en
+                        </span>
+                        <select
+                          name="expiration"
+                          defaultValue="24h"
+                          className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
+                        >
+                          <option value="24h">24 horas</option>
+                          <option value="3d">3 días</option>
+                          <option value="7d">7 días</option>
+                          <option value="30d">30 días</option>
+                          <option value="none">No expira</option>
+                        </select>
+                      </label>
+
+                      <label className="flex items-center gap-3 rounded-2xl bg-[#F5F8FC] px-4 py-4 text-sm font-black">
+                        <input
+                          name="is_featured"
+                          type="checkbox"
+                          className="h-5 w-5"
+                        />
+                        Destacar historia
+                      </label>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="rounded-full bg-[#071A33] px-6 py-4 text-lg font-black text-white hover:bg-[#164B8F] disabled:opacity-60"
+                    >
+                      {isSubmitting ? "Publicando..." : "Publicar historia"}
+                    </button>
+                  </form>
+                </Panel>
+              </div>
 
               <Panel
+                id="pendientes"
                 eyebrow="Historias de Fe"
                 title="Testimonios pendientes"
                 description="Revisa videos enviados por miembros/visitantes antes de publicarlos."
+                count={pendingTestimonies.length}
               >
                 {pendingTestimonies.length ? (
                   <div className="grid gap-4">
@@ -511,9 +586,11 @@ export default function AdminHistoriasPage() {
               </Panel>
 
               <Panel
+                id="aprobadas"
                 eyebrow="Historias públicas"
-                title="Historias aprobadas"
+                title="Testimonios aprobados"
                 description="Testimonios ya visibles para la iglesia."
+                count={approvedTestimonies.length}
               >
                 {approvedTestimonies.length ? (
                   <div className="grid gap-4">
@@ -534,9 +611,11 @@ export default function AdminHistoriasPage() {
               </Panel>
 
               <Panel
+                id="pastorales"
                 eyebrow="Hoy con Dios"
                 title="Historias pastorales publicadas"
                 description="Historias creadas por el pastor/admin para la sección Hoy con Dios."
+                count={pastorStories.length}
               >
                 {pastorStories.length ? (
                   <div className="grid gap-4">
@@ -563,39 +642,125 @@ export default function AdminHistoriasPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function HeroMetric({
+  label,
+  value,
+  subtext,
+  urgent,
+}: {
+  label: string;
+  value: number;
+  subtext: string;
+  urgent?: boolean;
+}) {
   return (
-    <div className="bg-white p-5 shadow-sm">
-      <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
+    <div className="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
+      <p className="text-xs font-black uppercase tracking-[0.25em] text-[#BBD7FF]">
         {label}
       </p>
-      <p className="mt-3 text-5xl font-black">{value}</p>
+      <div className="mt-2 flex items-end gap-3">
+        <p className="text-5xl font-black">{value}</p>
+        {urgent ? (
+          <span className="mb-2 rounded-full bg-[#FFF4D7] px-3 py-1 text-xs font-black uppercase text-[#8A5A00]">
+            Revisar
+          </span>
+        ) : null}
+      </div>
+      <p className="mt-2 text-sm font-bold text-white/65">{subtext}</p>
     </div>
   );
 }
 
+function PillLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="shrink-0 rounded-full bg-white px-5 py-3 text-sm font-black text-[#071A33] shadow-sm hover:bg-[#BBD7FF]"
+    >
+      {label}
+    </a>
+  );
+}
+
+function FeatureCard({
+  title,
+  description,
+  href,
+  label,
+  dark,
+}: {
+  title: string;
+  description: string;
+  href: string;
+  label: string;
+  dark?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      className={`rounded-[2rem] p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${
+        dark
+          ? "bg-[#071A33] text-white hover:bg-[#164B8F]"
+          : "bg-white text-[#071A33]"
+      }`}
+    >
+      <p
+        className={`text-xs font-black uppercase tracking-[0.28em] ${
+          dark ? "text-[#BBD7FF]" : "text-[#164B8F]"
+        }`}
+      >
+        {label}
+      </p>
+      <h3 className="mt-3 text-3xl font-black">{title}</h3>
+      <p
+        className={`mt-3 text-sm font-bold leading-7 ${
+          dark ? "text-white/70" : "text-[#52657D]"
+        }`}
+      >
+        {description}
+      </p>
+    </a>
+  );
+}
+
 function Panel({
+  id,
   eyebrow,
   title,
   description,
+  count,
   children,
 }: {
+  id: string;
   eyebrow: string;
   title: string;
   description: string;
-  children: React.ReactNode;
+  count?: number;
+  children: ReactNode;
 }) {
   return (
-    <section className="bg-white p-5 shadow-sm sm:p-7">
-      <div className="mb-6">
-        <p className="text-xs font-black uppercase tracking-[0.3em] text-[#164B8F]">
-          {eyebrow}
-        </p>
-        <h2 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h2>
-        <p className="mt-3 max-w-3xl text-base font-medium leading-8 text-[#52657D]">
-          {description}
-        </p>
+    <section id={id} className="scroll-mt-6 rounded-[2rem] bg-white p-5 shadow-sm sm:p-7">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-[#164B8F]">
+            {eyebrow}
+          </p>
+          <h2 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h2>
+          <p className="mt-3 max-w-3xl text-base font-bold leading-8 text-[#52657D]">
+            {description}
+          </p>
+        </div>
+
+        {typeof count === "number" ? (
+          <div className="rounded-2xl bg-[#F5F8FC] px-5 py-4 text-center">
+            <p className="text-4xl font-black">{count}</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#52657D]">
+              total
+            </p>
+          </div>
+        ) : null}
       </div>
+
       {children}
     </section>
   );
@@ -621,7 +786,7 @@ function Input({
         name={name}
         placeholder={placeholder}
         required={required}
-        className="mt-2 w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+        className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
       />
     </label>
   );
@@ -641,9 +806,9 @@ function StoryReviewCard({
   onSaveNotes: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <article className="border border-[#D9E5F5] bg-[#F5F8FC] p-4 sm:p-5">
-      <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
-        <div className="overflow-hidden bg-[#071A33]">
+    <article className="overflow-hidden rounded-[2rem] border border-[#D9E5F5] bg-[#F8FBFF] shadow-sm">
+      <div className="grid gap-0 lg:grid-cols-[300px_1fr]">
+        <div className="bg-[#071A33]">
           {story.media_url && story.media_type === "video" ? (
             <video
               src={story.media_url}
@@ -663,56 +828,53 @@ function StoryReviewCard({
           )}
         </div>
 
-        <div>
+        <div className="p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-3xl font-black">{story.title}</h3>
             <StatusBadge status={story.status} />
           </div>
 
-          <div className="mt-4 grid gap-2 text-sm font-bold text-[#52657D] md:grid-cols-2">
-            <p>Tipo: {story.story_type === "pastor" ? "Pastoral" : "Testimonio"}</p>
-            <p>Categoría: {story.category || "—"}</p>
-            <p>Nombre: {story.submitter_name || "—"}</p>
-            <p>Teléfono: {story.submitter_phone || "—"}</p>
-            <p>Correo: {story.submitter_email || "—"}</p>
-            <p>Idioma: {story.language || "—"}</p>
-            <p>Menor en video: {story.has_minor ? "Sí" : "No"}</p>
-            <p>Permiso menor: {story.minor_permission ? "Sí" : "No"}</p>
+          <div className="mt-4 grid gap-3 text-sm font-bold text-[#52657D] md:grid-cols-2">
+            <InfoLine
+              label="Tipo"
+              value={story.story_type === "pastor" ? "Pastoral" : "Testimonio"}
+            />
+            <InfoLine label="Categoría" value={story.category || "—"} />
+            <InfoLine label="Nombre" value={story.submitter_name || "—"} />
+            <InfoLine label="Teléfono" value={story.submitter_phone || "—"} />
+            <InfoLine label="Correo" value={story.submitter_email || "—"} />
+            <InfoLine label="Idioma" value={story.language || "—"} />
+            <InfoLine label="Menor en video" value={story.has_minor ? "Sí" : "No"} />
+            <InfoLine
+              label="Permiso menor"
+              value={story.minor_permission ? "Sí" : "No"}
+            />
           </div>
 
           {story.verse_reference || story.verse_text ? (
-            <div className="mt-4 bg-white p-4">
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
-                Versículo
-              </p>
-              <p className="mt-2 font-black">{story.verse_reference}</p>
+            <ContentBox label="Versículo">
+              <p className="font-black">{story.verse_reference}</p>
               <p className="mt-2 whitespace-pre-wrap text-sm font-medium leading-6 text-[#52657D]">
                 {story.verse_text}
               </p>
-            </div>
+            </ContentBox>
           ) : null}
 
-          <div className="mt-4 bg-white p-4">
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
-              Descripción
-            </p>
-            <p className="mt-2 whitespace-pre-wrap text-base font-medium leading-7 text-[#52657D]">
+          <ContentBox label="Descripción">
+            <p className="whitespace-pre-wrap text-base font-medium leading-7 text-[#52657D]">
               {story.caption || story.devotional_text || "Sin descripción."}
             </p>
-          </div>
+          </ContentBox>
 
           {story.prayer_focus ? (
-            <div className="mt-4 bg-white p-4">
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
-                Enfoque de oración
-              </p>
-              <p className="mt-2 whitespace-pre-wrap text-base font-medium leading-7 text-[#52657D]">
+            <ContentBox label="Enfoque de oración">
+              <p className="whitespace-pre-wrap text-base font-medium leading-7 text-[#52657D]">
                 {story.prayer_focus}
               </p>
-            </div>
+            </ContentBox>
           ) : null}
 
-          <form onSubmit={onSaveNotes} className="mt-4 bg-white p-4">
+          <form onSubmit={onSaveNotes} className="mt-4 rounded-3xl bg-white p-4">
             <input type="hidden" name="id" value={story.id} />
             <label className="text-xs font-black uppercase tracking-[0.22em] text-[#52657D]">
               Notas pastorales
@@ -720,11 +882,11 @@ function StoryReviewCard({
             <textarea
               name="pastor_notes"
               defaultValue={story.pastor_notes ?? ""}
-              className="mt-2 min-h-24 w-full border-2 border-[#D9E5F5] bg-white px-3 py-3 font-medium outline-none focus:border-[#164B8F]"
+              className="mt-2 min-h-24 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-3 font-medium outline-none focus:border-[#164B8F]"
             />
             <button
               type="submit"
-              className="mt-3 bg-[#071A33] px-4 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
+              className="mt-3 rounded-full bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
             >
               Guardar notas
             </button>
@@ -733,29 +895,29 @@ function StoryReviewCard({
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               onClick={onApprove}
-              className="bg-[#16834A] px-5 py-3 text-sm font-black text-white hover:bg-[#0F6A3A]"
+              className="rounded-full bg-[#16834A] px-5 py-3 text-sm font-black text-white hover:bg-[#0F6A3A]"
             >
               Aprobar
             </button>
 
             <button
               onClick={onReject}
-              className="bg-[#8A5A00] px-5 py-3 text-sm font-black text-white hover:bg-[#6A4500]"
+              className="rounded-full bg-[#8A5A00] px-5 py-3 text-sm font-black text-white hover:bg-[#6A4500]"
             >
               Rechazar/Ocultar
             </button>
 
-            <details className="bg-white">
+            <details className="overflow-hidden rounded-full bg-white">
               <summary className="cursor-pointer px-5 py-3 text-sm font-black text-[#B1182D] hover:bg-[#FFF1F3]">
                 Eliminar
               </summary>
-              <div className="border border-[#FFE0E6] p-4">
+              <div className="mt-2 rounded-2xl border border-[#FFE0E6] bg-white p-4">
                 <p className="text-sm font-bold text-[#52657D]">
                   Esto elimina la historia y el archivo de video/imagen.
                 </p>
                 <button
                   onClick={onDelete}
-                  className="mt-3 bg-[#B1182D] px-5 py-3 text-sm font-black text-white hover:bg-[#8F1324]"
+                  className="mt-3 rounded-full bg-[#B1182D] px-5 py-3 text-sm font-black text-white hover:bg-[#8F1324]"
                 >
                   Sí, eliminar
                 </button>
@@ -765,6 +927,31 @@ function StoryReviewCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function InfoLine({ label, value }: { label: string; value: string }) {
+  return (
+    <p>
+      <span className="text-[#071A33]">{label}:</span> {value}
+    </p>
+  );
+}
+
+function ContentBox({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="mt-4 rounded-3xl bg-white p-4">
+      <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
+        {label}
+      </p>
+      <div className="mt-2">{children}</div>
+    </div>
   );
 }
 
@@ -788,7 +975,7 @@ function StatusBadge({ status }: { status: string }) {
           : status;
 
   return (
-    <span className={`px-3 py-1 text-xs font-black uppercase ${className}`}>
+    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${className}`}>
       {label}
     </span>
   );
@@ -796,7 +983,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="border border-dashed border-[#BBD7FF] bg-[#F5F8FC] p-8 text-center">
+    <div className="rounded-3xl border border-dashed border-[#BBD7FF] bg-white p-8 text-center">
       <p className="text-lg font-bold text-[#52657D]">{text}</p>
     </div>
   );
