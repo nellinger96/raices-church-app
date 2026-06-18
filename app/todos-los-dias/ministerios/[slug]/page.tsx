@@ -21,6 +21,9 @@ type Ministry = {
   meeting_day: string | null;
   meeting_time: string | null;
   location: string | null;
+  zoom_url?: string | null;
+  zoom_meeting_id?: string | null;
+  zoom_passcode?: string | null;
   hero_image_url: string | null;
   contact_button_label: string | null;
 };
@@ -40,6 +43,9 @@ type MinistryFallback = {
   who: string[];
   nextSteps: string[];
   meetingNote: string;
+  zoomUrl?: string;
+  zoomMeetingId?: string;
+  zoomPasscode?: string;
 };
 
 const ministryFallbacks: Record<string, MinistryFallback> = {
@@ -64,22 +70,27 @@ const ministryFallbacks: Record<string, MinistryFallback> = {
   },
   "estudio-biblico": {
     category: "Discipulado",
-    heroImage: "/todos-los-dias/worship.png",
+    heroImage: "/todos-los-dias/bstudy.png",
     shortDescription:
-      "Un espacio para crecer en la Palabra, hacer preguntas y fortalecer tu relación con Dios.",
+      "Nuestra misión es que cada miembro de nuestra congregación estudie y medite en la Palabra de Dios.",
     description:
-      "Estudio Bíblico ayuda a la iglesia a profundizar en la Biblia de una manera práctica, clara y centrada en Jesús. Es un lugar para aprender, crecer y caminar con otros.",
+      "Nuestra misión es que cada miembro de nuestra congregación estudie y medite en la Palabra de Dios. Acompáñenos todos los miércoles a las 7 p. m. o los sábados a las 9 a. m. a nuestro estudio bíblico con la maestra Maria Martinez.",
     who: [
-      "Personas nuevas en la fe",
-      "Familias que desean crecer espiritualmente",
-      "Miembros que quieren estudiar la Biblia en comunidad",
+      "Personas que desean estudiar y meditar en la Palabra de Dios",
+      "Miembros que quieren crecer espiritualmente en comunidad",
+      "Familias que buscan un espacio bíblico por Zoom",
     ],
     nextSteps: [
-      "Comparte tu interés en el formulario",
-      "Te contactaremos con el horario disponible",
-      "Ven listo para aprender y crecer",
+      "Únete por Zoom los miércoles o sábados",
+      "Llena el formulario si deseas más información",
+      "Un líder de la iglesia podrá darte seguimiento",
     ],
-    meetingNote: "Horario y grupo por confirmar.",
+    meetingNote:
+      "El estudio bíblico se reúne por Zoom los miércoles a las 7:00 PM y los sábados a las 9:00 AM.",
+    zoomUrl:
+      "https://us06web.zoom.us/j/81942128119?pwd=nHRNO1mbfiv1PrlYjz5xeunQaBagcZ.1",
+    zoomMeetingId: "819 4212 8119",
+    zoomPasscode: "577610",
   },
   mujeres: {
     category: "Comunidad",
@@ -120,23 +131,28 @@ const ministryFallbacks: Record<string, MinistryFallback> = {
     meetingNote: "Horarios y edades se confirmarán pronto.",
   },
   oracion: {
-    category: "Cuidado pastoral",
-    heroImage: "/todos-los-dias/free-worship.png",
+    category: "Oración",
+    heroImage: "/todos-los-dias/oracion.png",
     shortDescription:
-      "Un ministerio para interceder, acompañar y levantar en oración las necesidades de la iglesia.",
+      "Conectando corazones alrededor del mundo. Únete en oración de lunes a viernes a las 8:00 AM por Zoom.",
     description:
-      "Oración existe para cubrir a la iglesia, las familias y la comunidad en oración. Creemos que Dios escucha, fortalece y responde cuando su pueblo ora unido.",
+      "Todos son bienvenidos, sin importar dónde estés. Tienes un lugar en nuestro círculo de oración. Ven como eres, ora con nosotros y sé fortalecido.",
     who: [
-      "Personas con corazón de intercesión",
-      "Miembros que desean aprender a orar por otros",
-      "Personas que quieren apoyar el cuidado espiritual de la iglesia",
+      "Personas que desean orar con otros durante la semana",
+      "Miembros con corazón de intercesión",
+      "Familias de México, Colombia, República Dominicana, Chile, España, USA, Panamá, Nicaragua y muchos más lugares",
     ],
     nextSteps: [
-      "Comparte tu interés",
-      "El equipo pastoral revisará tu solicitud",
-      "Te contactaremos para próximos pasos",
+      "Únete por Zoom de lunes a viernes",
+      "Ora con la familia de la iglesia",
+      "Llena el formulario si deseas más información",
     ],
-    meetingNote: "Reuniones de oración por confirmar.",
+    meetingNote:
+      "Grupo de oración por Zoom de lunes a viernes a las 8:00 AM, hora del Pacífico.",
+    zoomUrl:
+      "https://us06web.zoom.us/j/9962669916?pwd=eE5XM2wrODFxV1kyWS8wVG1BeG5pdz09&omn=89234754992",
+    zoomMeetingId: "996 266 9916",
+    zoomPasscode: "A8Mcqj",
   },
   jovenes: {
     category: "Próxima generación",
@@ -352,6 +368,11 @@ export default function MinistryPage() {
   const meetingDay = ministry.meeting_day || "Por confirmar";
   const meetingTime = ministry.meeting_time || "Por confirmar";
   const meetingLocation = ministry.location || "Iglesia de Todos los Días";
+  const zoomUrl = ministry.zoom_url || fallback.zoomUrl;
+  const zoomMeetingId = ministry.zoom_meeting_id || fallback.zoomMeetingId;
+  const zoomPasscode = ministry.zoom_passcode || fallback.zoomPasscode;
+  const leaderPhone = ministry.leader_phone;
+  const leaderEmail = ministry.leader_email;
   const buttonLabel = ministry.contact_button_label || "Quiero conectarme";
 
   return (
@@ -473,6 +494,37 @@ export default function MinistryPage() {
               <p className="mt-6 rounded-2xl bg-white/10 p-4 text-sm font-bold leading-6 text-white/75">
                 {fallback.meetingNote}
               </p>
+
+              {zoomUrl ? (
+                <div className="mt-5 rounded-2xl bg-white p-4 text-[#071A33]">
+                  <p className="text-xs font-black uppercase tracking-[0.25em] text-[#164B8F]">
+                    Enlace de Zoom
+                  </p>
+
+                  <a
+                    href={zoomUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex w-full justify-center rounded-full bg-[#2D1FD8] px-5 py-3 text-center text-sm font-black text-white hover:bg-[#1E1599]"
+                  >
+                    Unirme por Zoom
+                  </a>
+
+                  {zoomMeetingId ? (
+                    <p className="mt-3 text-sm font-bold">
+                      Meeting ID:{" "}
+                      <span className="text-[#52657D]">{zoomMeetingId}</span>
+                    </p>
+                  ) : null}
+
+                  {zoomPasscode ? (
+                    <p className="mt-1 text-sm font-bold">
+                      Passcode:{" "}
+                      <span className="text-[#52657D]">{zoomPasscode}</span>
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             <div className="rounded-[2rem] bg-white p-6 shadow-sm sm:p-8">
@@ -504,6 +556,28 @@ export default function MinistryPage() {
               <p className="mt-5 text-base font-medium leading-7 text-[#52657D]">
                 {leaderBio}
               </p>
+
+              {leaderPhone || leaderEmail ? (
+                <div className="mt-5 flex flex-wrap gap-3">
+                  {leaderPhone ? (
+                    <a
+                      href={`tel:${leaderPhone.replace(/[^0-9+]/g, "")}`}
+                      className="rounded-full bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
+                    >
+                      Llamar: {leaderPhone}
+                    </a>
+                  ) : null}
+
+                  {leaderEmail ? (
+                    <a
+                      href={`mailto:${leaderEmail}`}
+                      className="rounded-full bg-[#F5F8FC] px-5 py-3 text-sm font-black text-[#071A33] hover:bg-[#BBD7FF]"
+                    >
+                      Enviar correo
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
 
               <div className="mt-5 rounded-2xl bg-[#F5F8FC] p-4 text-sm font-black leading-6 text-[#071A33]">
                 ¿Quieres conectarte con este ministerio? Llena el formulario y
