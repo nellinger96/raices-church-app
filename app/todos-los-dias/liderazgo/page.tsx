@@ -1,45 +1,57 @@
 import { todosLosDiasChurch } from "@/lib/churches/todos-los-dias";
 
+const mariaBio = "Maria Martinez nació en Apatzingán, Michoacán, México. A los 25 años emigró a los Estados Unidos, donde trabajó arduamente en diversos empleos para poder subsistir junto a su familia. Casada y madre de dos hijos, se vio varias veces al borde de la muerte; después de una cirugía en la columna vertebral que la dejó paralítica, sobrevivió a un cáncer invasivo y más tarde sufrió un derrame cerebral. Sin embargo, estos desafíos de salud no disminuyeron su firme deseo de conocer la Palabra de Dios. Para eso, asistió al Instituto Teológico de Ministerios. Además, se graduó de la Universidad Internacional Mahanaim de Capellanes, de la Escuela de Evangelistas Alberto Mottesi y del Instituto Bíblico Cristo es el Señor.";
+
 const ministryLeaders = [
   {
     ministry: "Evangelismo",
     name: "Por confirmar",
+    role: "Líder de ministerio",
     description:
       "Liderazgo enfocado en alcance, servicio y conexión con la comunidad.",
   },
   {
     ministry: "Estudio Bíblico",
-    name: "Por confirmar",
+    name: "Maria Martinez",
+    role: "Maestra de Estudio Bíblico",
+    photo: "/todos-los-dias/maria.png",
+    href: "/todos-los-dias/ministerios/estudio-biblico",
     description:
-      "Liderazgo enfocado en enseñanza bíblica, discipulado y crecimiento espiritual.",
+      "Lidera el estudio bíblico para ayudar a la congregación a estudiar, meditar y crecer en la Palabra de Dios.",
   },
   {
     ministry: "Mujeres",
     name: "Por confirmar",
+    role: "Líder de ministerio",
     description:
       "Liderazgo enfocado en acompañar, animar y fortalecer a las mujeres de la iglesia.",
   },
   {
     ministry: "Escuela Dominical",
     name: "Por confirmar",
+    role: "Líder de ministerio",
     description:
       "Liderazgo enfocado en formación bíblica para niños, jóvenes y familias.",
   },
   {
     ministry: "Oración",
-    name: "Por confirmar",
+    name: "Equipo de Oración",
+    role: "Grupo de Oración",
+    href: "/todos-los-dias/ministerios/oracion",
     description:
-      "Liderazgo enfocado en intercesión, cuidado pastoral y seguimiento espiritual.",
+      "Liderazgo enfocado en intercesión, cuidado pastoral y oración por familias alrededor del mundo.",
   },
   {
     ministry: "Jóvenes",
     name: "Por confirmar",
+    role: "Líder de ministerio",
     description:
       "Liderazgo enfocado en ayudar a la nueva generación a crecer en fe y propósito.",
   },
   {
     ministry: "Alabanza",
     name: "Por confirmar",
+    role: "Líder de ministerio",
     description:
       "Liderazgo enfocado en adoración, música y preparación espiritual de cada servicio.",
   },
@@ -156,32 +168,81 @@ export default function LiderazgoPage() {
             </p>
 
             <div className="mt-9 grid gap-4 sm:grid-cols-3">
-              <div className="border-t-4 border-[#164B8F] bg-white p-5 shadow-sm">
-                <p className="text-3xl font-black">Fe</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Guiados por la Palabra de Dios
-                </p>
-              </div>
-
-              <div className="border-t-4 border-[#B1182D] bg-white p-5 shadow-sm">
-                <p className="text-3xl font-black">Familia</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Una iglesia para todas las generaciones
-                </p>
-              </div>
-
-              <div className="border-t-4 border-[#164B8F] bg-white p-5 shadow-sm">
-                <p className="text-3xl font-black">Servicio</p>
-                <p className="mt-2 text-sm font-bold text-[#52657D]">
-                  Amando y sirviendo a la comunidad
-                </p>
-              </div>
+              <ValueCard title="Fe" text="Guiados por la Palabra de Dios" />
+              <ValueCard title="Familia" text="Una iglesia para todas las generaciones" red />
+              <ValueCard title="Servicio" text="Amando y sirviendo a la comunidad" />
             </div>
           </div>
         </div>
       </section>
 
       <section className="bg-white px-4 py-16 sm:px-6 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="relative min-h-[430px] overflow-hidden bg-[#071A33] shadow-xl">
+              <img
+                src="/todos-los-dias/maria.png"
+                alt="Maria Martinez"
+                className="h-full min-h-[430px] w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/70 to-transparent" />
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative min-h-[280px] overflow-hidden bg-[#071A33] shadow-xl">
+                <img
+                  src="/todos-los-dias/maria2.png"
+                  alt="Maria Martinez enseñando estudio bíblico"
+                  className="h-full min-h-[280px] w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/60 to-transparent" />
+              </div>
+
+              <div className="bg-[#071A33] p-7 text-white shadow-xl">
+                <p className="text-sm font-black uppercase tracking-[0.3em] text-[#BBD7FF]">
+                  Estudio Bíblico
+                </p>
+                <h2 className="mt-3 text-3xl font-black">Maria Martinez</h2>
+                <p className="mt-2 font-bold text-white/70">
+                  Miércoles 7:00 PM · Sábados 9:00 AM
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
+              Maestra de Estudio Bíblico
+            </p>
+
+            <h2 className="mt-4 text-5xl font-black leading-tight md:text-7xl">
+              Maria Martinez
+            </h2>
+
+            <p className="mt-6 text-lg font-medium leading-8 text-[#52657D] sm:text-xl sm:leading-9">
+              {mariaBio}
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="/todos-los-dias/ministerios/estudio-biblico"
+                className="rounded-full bg-[#071A33] px-7 py-4 text-center text-sm font-black text-white hover:bg-[#164B8F]"
+              >
+                Ver Estudio Bíblico
+              </a>
+
+              <a
+                href="tel:7144897013"
+                className="rounded-full bg-[#F5F8FC] px-7 py-4 text-center text-sm font-black text-[#071A33] hover:bg-[#BBD7FF]"
+              >
+                Llamar: 714-489-7013
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#F5F8FC] px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 max-w-4xl">
             <p className="text-sm font-black uppercase tracking-[0.35em] text-[#164B8F]">
@@ -200,15 +261,37 @@ export default function LiderazgoPage() {
             {ministryLeaders.map((leader) => (
               <article
                 key={leader.ministry}
-                className="border-t-4 border-[#164B8F] bg-[#F5F8FC] p-6"
+                className="overflow-hidden border-t-4 border-[#164B8F] bg-white shadow-sm"
               >
-                <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
-                  {leader.ministry}
-                </p>
-                <h3 className="mt-3 text-3xl font-black">{leader.name}</h3>
-                <p className="mt-4 text-base font-medium leading-7 text-[#52657D]">
-                  {leader.description}
-                </p>
+                {leader.photo ? (
+                  <img
+                    src={leader.photo}
+                    alt={leader.name}
+                    className="h-60 w-full object-cover"
+                  />
+                ) : null}
+
+                <div className="p-6">
+                  <p className="text-sm font-black uppercase tracking-[0.25em] text-[#164B8F]">
+                    {leader.ministry}
+                  </p>
+                  <h3 className="mt-3 text-3xl font-black">{leader.name}</h3>
+                  <p className="mt-1 text-sm font-black text-[#52657D]">
+                    {leader.role}
+                  </p>
+                  <p className="mt-4 text-base font-medium leading-7 text-[#52657D]">
+                    {leader.description}
+                  </p>
+
+                  {leader.href ? (
+                    <a
+                      href={leader.href}
+                      className="mt-5 inline-flex rounded-full bg-[#071A33] px-5 py-3 text-sm font-black text-white hover:bg-[#164B8F]"
+                    >
+                      Ver ministerio
+                    </a>
+                  ) : null}
+                </div>
               </article>
             ))}
           </div>
@@ -235,5 +318,26 @@ export default function LiderazgoPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+function ValueCard({
+  title,
+  text,
+  red,
+}: {
+  title: string;
+  text: string;
+  red?: boolean;
+}) {
+  return (
+    <div
+      className={`border-t-4 ${
+        red ? "border-[#B1182D]" : "border-[#164B8F]"
+      } bg-white p-5 shadow-sm`}
+    >
+      <p className="text-3xl font-black">{title}</p>
+      <p className="mt-2 text-sm font-bold text-[#52657D]">{text}</p>
+    </div>
   );
 }
