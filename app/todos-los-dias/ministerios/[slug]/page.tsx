@@ -538,7 +538,7 @@ export default function MinistryPage() {
                     <img
                       src={ministry.leader_photo_url}
                       alt={leaderName}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover object-top"
                     />
                   ) : (
                     <span className="text-3xl font-black text-[#164B8F]">

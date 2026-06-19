@@ -183,7 +183,7 @@ export default function LiderazgoPage() {
               <img
                 src="/todos-los-dias/maria.png"
                 alt="Maria Martinez"
-                className="h-full min-h-[430px] w-full object-cover"
+                className="h-full min-h-[430px] w-full object-cover object-top"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/70 to-transparent" />
             </div>
@@ -193,7 +193,7 @@ export default function LiderazgoPage() {
                 <img
                   src="/todos-los-dias/maria2.png"
                   alt="Maria Martinez enseñando estudio bíblico"
-                  className="h-full min-h-[280px] w-full object-cover"
+                  className="h-full min-h-[280px] w-full object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/60 to-transparent" />
               </div>
@@ -267,7 +267,7 @@ export default function LiderazgoPage() {
                   <img
                     src={leader.photo}
                     alt={leader.name}
-                    className="h-60 w-full object-cover"
+                    className="h-60 w-full object-cover object-top"
                   />
                 ) : null}
 

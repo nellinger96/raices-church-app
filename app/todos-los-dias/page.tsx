@@ -750,25 +750,20 @@ export default function TodosLosDiasPage() {
               Dar por Zelle
             </h3>
             <p className="mt-4 text-lg font-medium leading-8 text-[#52657D]">
-              Aquí irá el correo, teléfono o código QR oficial de la iglesia.
+              Si desea enviar sus donaciones a través de Zelle, por favor
+              escanee el código QR. Si prefiere emitir un cheque, por favor
+              hágalo a nombre de: <strong>Ministry Inc.</strong> Muchas gracias
+              por sus donaciones.
             </p>
 
             <div className="mt-6 bg-[#F5F8FC] p-5 text-center">
-              <p className="mb-4 text-base font-black uppercase tracking-[0.18em] text-[#071A33]">
-                Cheques a nombre de: MINISTRY INC
-              </p>
-
-              <div className="mx-auto max-w-xs bg-white p-4 shadow-sm">
+              <div className="mx-auto flex h-72 w-72 items-center justify-center overflow-hidden bg-white p-3 shadow-sm">
                 <img
                   src="/todos-los-dias/qr.png"
                   alt="Código QR para dar por Zelle"
-                  className="h-auto w-full object-contain"
+                  className="h-full w-full object-cover object-[50%_72%]"
                 />
               </div>
-
-              <p className="mt-4 text-sm font-bold text-[#52657D]">
-                Escanea el código para dar por Zelle.
-              </p>
             </div>
           </div>
         </div>
