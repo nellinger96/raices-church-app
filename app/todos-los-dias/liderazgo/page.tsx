@@ -264,11 +264,13 @@ export default function LiderazgoPage() {
                 className="overflow-hidden border-t-4 border-[#164B8F] bg-white shadow-sm"
               >
                 {leader.photo ? (
-                  <img
-                    src={leader.photo}
-                    alt={leader.name}
-                    className="h-60 w-full object-cover object-top"
-                  />
+                  <div className="flex h-60 w-full items-center justify-center bg-[#F5F8FC] p-4">
+                    <img
+                      src={leader.photo}
+                      alt={leader.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
                 ) : null}
 
                 <div className="p-6">

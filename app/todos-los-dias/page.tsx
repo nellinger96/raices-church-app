@@ -759,9 +759,9 @@ export default function TodosLosDiasPage() {
             <div className="mt-6 bg-[#F5F8FC] p-5 text-center">
               <div className="mx-auto flex h-72 w-72 items-center justify-center overflow-hidden bg-white p-3 shadow-sm">
                 <img
-                  src="/todos-los-dias/qr.png"
+                  src="/todos-los-dias/zelle.png"
                   alt="Código QR para dar por Zelle"
-                  className="h-full w-full object-cover object-[50%_72%]"
+                  className="h-full w-full object-contain"
                 />
               </div>
             </div>
