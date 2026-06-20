@@ -351,7 +351,7 @@ export default function TodosLosDiasPage() {
 
                 <div className="mt-4 space-y-2">
                   <p className="text-base font-black text-[#071A33] sm:text-lg">
-                    English Service · 10:00 AM
+                    English Service · 9:00 AM
                   </p>
 
                   <p className="text-base font-black text-[#B1182D] sm:text-lg">
@@ -380,7 +380,7 @@ export default function TodosLosDiasPage() {
                         The Main Place
                       </h3>
                       <p className="text-sm font-bold text-[#52657D]">
-                        English Service · 10:00 AM
+                        English Service · 9:00 AM
                       </p>
                     </div>
                   </div>
