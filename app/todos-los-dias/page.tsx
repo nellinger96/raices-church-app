@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import {
   missionVision,
   todosLosDiasChurch,
@@ -9,6 +9,17 @@ import {
 import { createClient } from "@/lib/supabase/client";
 
 type ActionFormType = "visitor" | "prayer" | "volunteer";
+
+type PublicAnnouncement = {
+  title: string;
+  category: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  flyer: string;
+  accent: string;
+};
 
 const churchAddress = "1310 E Lincoln Ave, Orange, CA 92865";
 
@@ -88,7 +99,7 @@ const ministryLinks = [
   { name: "Alabanza", href: "/todos-los-dias/ministerios/alabanza" },
 ];
 
-const upcomingAnnouncements = [
+const fallbackAnnouncements: PublicAnnouncement[] = [
   {
     title: "Adoración Libre",
     category: "Adoración / Oración / Libertad",
@@ -135,6 +146,68 @@ const upcomingAnnouncements = [
   },
 ];
 
+function getAnnouncementAccent(category?: string | null, title?: string | null) {
+  const text = `${category ?? ""} ${title ?? ""}`.toLowerCase();
+
+  if (
+    text.includes("oración") ||
+    text.includes("adoración") ||
+    text.includes("worship")
+  ) {
+    return "red";
+  }
+
+  if (
+    text.includes("niños") ||
+    text.includes("escuelita") ||
+    text.includes("bíblica") ||
+    text.includes("vbs")
+  ) {
+    return "purple";
+  }
+
+  if (
+    text.includes("parque") ||
+    text.includes("familia") ||
+    text.includes("comunidad")
+  ) {
+    return "green";
+  }
+
+  return "pink";
+}
+
+async function loadPublishedAnnouncements() {
+  const supabase = createClient();
+  const churchId = await getTodosLosDiasChurchId();
+
+  const { data, error } = await supabase
+    .from("announcements")
+    .select(
+      "title, category, description, date_text, time_text, location, flyer_url, sort_order, created_at",
+    )
+    .eq("church_id", churchId)
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return (data ?? []).map((announcement) => ({
+    title: announcement.title ?? "Anuncio",
+    category: announcement.category ?? "Anuncio",
+    date: announcement.date_text ?? "",
+    time: announcement.time_text ?? "",
+    location: announcement.location ?? "",
+    description: announcement.description ?? "",
+    flyer: announcement.flyer_url ?? "/todos-los-dias/logo.png",
+    accent: getAnnouncementAccent(announcement.category, announcement.title),
+  }));
+}
+
 async function getTodosLosDiasChurchId() {
   const supabase = createClient();
 
@@ -153,6 +226,36 @@ async function getTodosLosDiasChurchId() {
 
 export default function TodosLosDiasPage() {
   const [activeForm, setActiveForm] = useState<ActionFormType | null>(null);
+  const [announcements, setAnnouncements] = useState<PublicAnnouncement[]>([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAnnouncements() {
+      try {
+        const publishedAnnouncements = await loadPublishedAnnouncements();
+
+        if (isMounted) {
+          setAnnouncements(publishedAnnouncements);
+        }
+      } catch {
+        if (isMounted) {
+          setAnnouncements(fallbackAnnouncements);
+        }
+      }
+
+      if (isMounted) {
+        setAnnouncementsLoading(false);
+      }
+    }
+
+    loadAnnouncements();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function openForm(formType: ActionFormType) {
     setActiveForm(formType);
@@ -351,7 +454,7 @@ export default function TodosLosDiasPage() {
 
                 <div className="mt-4 space-y-2">
                   <p className="text-base font-black text-[#071A33] sm:text-lg">
-                    English Service · 9:00 AM
+                    English Service · 10:00 AM
                   </p>
 
                   <p className="text-base font-black text-[#B1182D] sm:text-lg">
@@ -380,7 +483,7 @@ export default function TodosLosDiasPage() {
                         The Main Place
                       </h3>
                       <p className="text-sm font-bold text-[#52657D]">
-                        English Service · 9:00 AM
+                        English Service · 10:00 AM
                       </p>
                     </div>
                   </div>
@@ -483,14 +586,28 @@ export default function TodosLosDiasPage() {
             </p>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            {upcomingAnnouncements.map((announcement) => (
-              <AnnouncementCard
-                key={announcement.title}
-                announcement={announcement}
-              />
-            ))}
-          </div>
+          {announcementsLoading ? (
+            <div className="bg-white p-8 text-center shadow-xl">
+              <p className="text-lg font-black text-[#52657D]">
+                Cargando anuncios...
+              </p>
+            </div>
+          ) : announcements.length ? (
+            <div className="grid gap-6 lg:grid-cols-2">
+              {announcements.map((announcement) => (
+                <AnnouncementCard
+                  key={`${announcement.title}-${announcement.date}`}
+                  announcement={announcement}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-8 text-center shadow-xl">
+              <p className="text-lg font-black text-[#52657D]">
+                No hay anuncios publicados por ahora.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

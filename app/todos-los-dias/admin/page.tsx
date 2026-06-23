@@ -986,6 +986,27 @@ function AnnouncementEditor({ announcement }: { announcement: any }) {
           Guardar anuncio
         </button>
       </form>
+
+      <details className="mx-5 mb-5 overflow-hidden rounded-2xl bg-white">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-black text-[#B1182D] hover:bg-[#FFF1F3]">
+          Eliminar anuncio
+        </summary>
+
+        <form action={deleteAnnouncement} className="border-t border-[#FFE0E6] p-4">
+          <input type="hidden" name="id" value={announcement.id} />
+
+          <p className="text-sm font-bold leading-6 text-[#52657D]">
+            Esto elimina el anuncio del dashboard y de la página pública.
+          </p>
+
+          <button
+            type="submit"
+            className="mt-3 rounded-full bg-[#B1182D] px-5 py-3 text-sm font-black text-white hover:bg-[#8F1324]"
+          >
+            Sí, eliminar anuncio
+          </button>
+        </form>
+      </details>
     </details>
   );
 }
@@ -1321,6 +1342,21 @@ async function updateAnnouncement(formData: FormData) {
       sort_order: getSortOrder(formData),
       is_published: formData.get("is_published") === "on",
     })
+    .eq("id", getString(formData, "id"))
+    .eq("church_id", church.id);
+
+  revalidatePath(ADMIN_PATH);
+  revalidatePath(PUBLIC_PATH);
+}
+
+async function deleteAnnouncement(formData: FormData) {
+  "use server";
+
+  const { supabase, church } = await getChurchAndRequireAdmin();
+
+  await supabase
+    .from("announcements")
+    .delete()
     .eq("id", getString(formData, "id"))
     .eq("church_id", church.id);
 
