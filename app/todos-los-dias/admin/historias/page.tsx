@@ -269,6 +269,86 @@ export default function AdminHistoriasPage() {
     setIsSubmitting(false);
   }
 
+
+  async function createTestimonyFromDashboard(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!church) return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const title = String(formData.get("testimony_title") || "").trim();
+    const submitterName = String(formData.get("submitter_name") || "").trim();
+    const submitterPhone = String(formData.get("submitter_phone") || "").trim();
+    const submitterEmail = String(formData.get("submitter_email") || "").trim();
+    const category = String(formData.get("category") || "Testimonio").trim();
+    const caption = String(formData.get("testimony_caption") || "").trim();
+    const language = String(formData.get("language") || "Español").trim();
+    const isFeatured = formData.get("testimony_is_featured") === "on";
+    const hasMinor = formData.get("has_minor") === "on";
+    const minorPermission = formData.get("minor_permission") === "on";
+    const file = formData.get("testimony_media") as File | null;
+
+    if (!title) {
+      setStatusMessage("Agrega un título para el testimonio.");
+      return;
+    }
+
+    if (!file || file.size === 0) {
+      setStatusMessage("Agrega un video o imagen para el testimonio.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setStatusMessage("");
+
+    try {
+      const supabase = createClient();
+      const media = await uploadStoryMedia(
+        file,
+        "todos-los-dias/testimonios/admin",
+      );
+
+      const { error } = await supabase.from("faith_stories").insert({
+        church_id: church.id,
+        story_type: "testimony",
+        status: "approved",
+        title,
+        caption,
+        category,
+        language,
+        submitter_name: submitterName || "Testimonio de la iglesia",
+        submitter_phone: submitterPhone,
+        submitter_email: submitterEmail,
+        display_name_preference: submitterName ? "first_name" : "anonymous",
+        has_minor: hasMinor,
+        minor_permission: hasMinor ? minorPermission : false,
+        consent_to_share: true,
+        media_url: media.mediaUrl,
+        media_path: media.mediaPath,
+        media_type: media.mediaType,
+        is_featured: isFeatured,
+        approved_at: new Date().toISOString(),
+      });
+
+      if (error) throw error;
+
+      form.reset();
+      setStatusMessage("Testimonio publicado en Historias de Fe.");
+      await loadDashboard();
+    } catch (error) {
+      console.error(error);
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Hubo un error al publicar el testimonio.",
+      );
+    }
+
+    setIsSubmitting(false);
+  }
+
   async function updateStoryStatus(story: FaithStory, status: FaithStory["status"]) {
     const supabase = createClient();
 
@@ -410,6 +490,7 @@ export default function AdminHistoriasPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex gap-3 overflow-x-auto pb-2">
             <PillLink href="#crear" label="Crear Hoy con Dios" />
+            <PillLink href="#crear-testimonio" label="Subir Testimonio" />
             <PillLink href="#pendientes" label="Pendientes" />
             <PillLink href="#aprobadas" label="Aprobadas" />
             <PillLink href="#pastorales" label="Pastorales" />
@@ -447,6 +528,12 @@ export default function AdminHistoriasPage() {
                     href="#pendientes"
                     label="Revisar pendientes"
                     dark
+                  />
+                  <FeatureCard
+                    title="Subir testimonio"
+                    description="Publica un testimonio directamente desde el panel pastoral sin pasar por el formulario público."
+                    href="#crear-testimonio"
+                    label="Nueva Historia de Fe"
                   />
                 </aside>
 
@@ -559,6 +646,138 @@ export default function AdminHistoriasPage() {
                   </form>
                 </Panel>
               </div>
+
+              <Panel
+                id="crear-testimonio"
+                eyebrow="Historias de Fe"
+                title="Subir testimonio desde el panel"
+                description="Publica un testimonio directamente desde el dashboard pastoral. Se aprueba automáticamente y aparece en Historias de Fe."
+              >
+                <form onSubmit={createTestimonyFromDashboard} className="grid gap-5">
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <Input
+                      name="testimony_title"
+                      label="Título del testimonio"
+                      required
+                    />
+                    <Input
+                      name="submitter_name"
+                      label="Nombre de la persona"
+                      placeholder="Opcional"
+                    />
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-3">
+                    <Input
+                      name="submitter_phone"
+                      label="Teléfono"
+                      placeholder="Opcional"
+                    />
+                    <Input
+                      name="submitter_email"
+                      label="Correo"
+                      placeholder="Opcional"
+                    />
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Categoría
+                      </span>
+                      <select
+                        name="category"
+                        defaultValue="Testimonio"
+                        className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
+                      >
+                        <option>Testimonio</option>
+                        <option>Sanidad</option>
+                        <option>Familia</option>
+                        <option>Fe</option>
+                        <option>Restauración</option>
+                        <option>Oración respondida</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="block">
+                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                      Descripción / resumen
+                    </span>
+                    <textarea
+                      name="testimony_caption"
+                      className="mt-2 min-h-32 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-medium outline-none focus:border-[#164B8F]"
+                      placeholder="Escribe un resumen breve del testimonio..."
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                      Video o imagen del testimonio
+                    </span>
+                    <input
+                      name="testimony_media"
+                      type="file"
+                      required
+                      accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp"
+                      className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
+                    />
+                    <p className="mt-2 text-xs font-bold text-[#52657D]">
+                      Máximo {MAX_FILE_SIZE_MB} MB.
+                    </p>
+                  </label>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <label className="block">
+                      <span className="text-xs font-black uppercase tracking-[0.22em] text-[#164B8F]">
+                        Idioma
+                      </span>
+                      <select
+                        name="language"
+                        defaultValue="Español"
+                        className="mt-2 w-full rounded-2xl border-2 border-[#D9E5F5] bg-white px-4 py-4 font-bold outline-none focus:border-[#164B8F]"
+                      >
+                        <option>Español</option>
+                        <option>English</option>
+                      </select>
+                    </label>
+
+                    <label className="flex items-center gap-3 rounded-2xl bg-[#F5F8FC] px-4 py-4 text-sm font-black">
+                      <input
+                        name="testimony_is_featured"
+                        type="checkbox"
+                        className="h-5 w-5"
+                      />
+                      Destacar testimonio
+                    </label>
+
+                    <label className="flex items-center gap-3 rounded-2xl bg-[#F5F8FC] px-4 py-4 text-sm font-black">
+                      <input name="has_minor" type="checkbox" className="h-5 w-5" />
+                      Aparece un menor
+                    </label>
+                  </div>
+
+                  <label className="flex items-start gap-3 rounded-2xl bg-[#FFF4D7] px-4 py-4 text-sm font-black text-[#8A5A00]">
+                    <input
+                      name="minor_permission"
+                      type="checkbox"
+                      className="mt-1 h-5 w-5"
+                    />
+                    Confirmo que hay permiso para compartir este testimonio si
+                    aparece un menor de edad.
+                  </label>
+
+                  <div className="rounded-2xl bg-[#F5F8FC] p-4 text-sm font-bold leading-7 text-[#52657D]">
+                    Este testimonio se publicará directamente en Historias de Fe
+                    porque fue subido desde el dashboard pastoral.
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="rounded-full bg-[#B1182D] px-6 py-4 text-lg font-black text-white hover:bg-[#8F1324] disabled:opacity-60"
+                  >
+                    {isSubmitting ? "Publicando..." : "Publicar testimonio"}
+                  </button>
+                </form>
+              </Panel>
 
               <Panel
                 id="pendientes"
