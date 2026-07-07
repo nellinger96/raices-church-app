@@ -47,6 +47,54 @@ function getSortOrder(formData: FormData) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function sanitizeFileName(fileName: string) {
+  return fileName
+    .toLowerCase()
+    .replace(/[^a-z0-9.\-_]/g, "-")
+    .replace(/-+/g, "-");
+}
+
+async function uploadAnnouncementFlyer(
+  formData: FormData,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+) {
+  const existingUrl = getOptionalString(formData, "flyer_url");
+  const file = formData.get("flyer_file");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return existingUrl;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    throw new Error("El volante debe ser una imagen.");
+  }
+
+  const maxFileSize = 10 * 1024 * 1024;
+
+  if (file.size > maxFileSize) {
+    throw new Error("La imagen debe pesar menos de 10 MB.");
+  }
+
+  const safeFileName = sanitizeFileName(file.name || "announcement.png");
+  const path = `${CHURCH_SLUG}/announcements/${Date.now()}-${crypto.randomUUID()}-${safeFileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("story-media")
+    .upload(path, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const { data } = supabase.storage.from("story-media").getPublicUrl(path);
+
+  return data.publicUrl;
+}
+
 async function getChurchAndRequireAdmin() {
   const supabase = await createClient();
 
@@ -880,10 +928,9 @@ function CreateAnnouncementForm() {
         <AdminInput name="time_text" label="Hora" />
       </div>
       <AdminInput name="location" label="Lugar" />
-      <AdminInput
-        name="flyer_url"
-        label="URL del volante"
-        placeholder="/todos-los-dias/example.png"
+      <AdminFileInput
+        name="flyer_file"
+        label="Subir volante desde el teléfono"
       />
       <AdminInput name="sort_order" label="Orden" defaultValue="0" />
 
@@ -951,11 +998,34 @@ function AnnouncementEditor({ announcement }: { announcement: any }) {
             label="Lugar"
             defaultValue={announcement.location}
           />
-          <AdminInput
+          <input
+            type="hidden"
             name="flyer_url"
-            label="URL del volante"
-            defaultValue={announcement.flyer_url}
+            value={announcement.flyer_url ?? ""}
           />
+
+          <div className="md:col-span-2">
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.25em] text-[#52657D]">
+              Volante actual
+            </p>
+
+            {announcement.flyer_url ? (
+              <img
+                src={announcement.flyer_url}
+                alt={announcement.title || "Volante del anuncio"}
+                className="mb-4 max-h-64 w-full rounded-2xl border border-[#D9E5F5] bg-white object-contain p-2"
+              />
+            ) : (
+              <p className="mb-4 rounded-2xl bg-white p-4 text-sm font-bold text-[#52657D]">
+                Este anuncio todavía no tiene volante.
+              </p>
+            )}
+
+            <AdminFileInput
+              name="flyer_file"
+              label="Subir nuevo volante desde el teléfono"
+            />
+          </div>
           <AdminInput
             name="sort_order"
             label="Orden"
@@ -1155,6 +1225,31 @@ function AdminInput({
   );
 }
 
+function AdminFileInput({
+  name,
+  label,
+}: {
+  name: string;
+  label: string;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs font-black uppercase tracking-[0.25em] text-[#52657D]">
+        {label}
+      </span>
+      <input
+        type="file"
+        name={name}
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="w-full border-2 border-[#D9E5F5] bg-white px-4 py-4 text-base font-black outline-none focus:border-[#164B8F]"
+      />
+      <span className="mt-2 block text-xs font-bold text-[#52657D]">
+        Formatos permitidos: JPG, PNG, WEBP o GIF. Máximo 10 MB.
+      </span>
+    </label>
+  );
+}
+
 function AdminTextarea({
   name,
   label,
@@ -1306,6 +1401,7 @@ async function createAnnouncement(formData: FormData) {
   "use server";
 
   const { supabase, church } = await getChurchAndRequireAdmin();
+  const flyerUrl = await uploadAnnouncementFlyer(formData, supabase);
 
   await supabase.from("announcements").insert({
     church_id: church.id,
@@ -1315,7 +1411,7 @@ async function createAnnouncement(formData: FormData) {
     date_text: getOptionalString(formData, "date_text"),
     time_text: getOptionalString(formData, "time_text"),
     location: getOptionalString(formData, "location"),
-    flyer_url: getOptionalString(formData, "flyer_url"),
+    flyer_url: flyerUrl,
     sort_order: getSortOrder(formData),
     is_published: formData.get("is_published") === "on",
   });
@@ -1328,6 +1424,7 @@ async function updateAnnouncement(formData: FormData) {
   "use server";
 
   const { supabase, church } = await getChurchAndRequireAdmin();
+  const flyerUrl = await uploadAnnouncementFlyer(formData, supabase);
 
   await supabase
     .from("announcements")
@@ -1338,7 +1435,7 @@ async function updateAnnouncement(formData: FormData) {
       date_text: getOptionalString(formData, "date_text"),
       time_text: getOptionalString(formData, "time_text"),
       location: getOptionalString(formData, "location"),
-      flyer_url: getOptionalString(formData, "flyer_url"),
+      flyer_url: flyerUrl,
       sort_order: getSortOrder(formData),
       is_published: formData.get("is_published") === "on",
     })
